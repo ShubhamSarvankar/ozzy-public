@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const levelModel = require('../models/levelSchema');
 require('dotenv').config();
 
-const guildId = process.env.guildID;
+const guildId = '545643483243872266';
 const mee6Url = `https://mee6.xyz/api/plugins/levels/leaderboard/${guildId}`;
 const database = process.env.MONGODB_SRV;
 

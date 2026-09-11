@@ -8,7 +8,6 @@ module.exports = {
     .setName('help')
     .setDescription('Shows a paginated list of all commands and their descriptions'),
   async execute(interaction) {
-    console.log("Help command executed by:", interaction.user.tag);
 
     // Fetch member & color
     const member = await interaction.guild.members.fetch(interaction.user.id);

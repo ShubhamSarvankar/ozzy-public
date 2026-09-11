@@ -1,5 +1,7 @@
 const { Events } = require("discord.js");
 const reminderModel = require('../models/reminderSchema');
+const tempRoleManager = require('../utils/tempRoleManager');
+const roleReactManager = require('../utils/roleReactManager');
 
 module.exports = {
   name: Events.ClientReady,
@@ -21,5 +23,8 @@ module.exports = {
     } catch (error) {
       console.error('Error setting up reminders:', error);
     }
+
+    tempRoleManager.initialize(client);
+    roleReactManager.initialize(client);
   },
 };

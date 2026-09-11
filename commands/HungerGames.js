@@ -218,7 +218,6 @@ module.exports = {
 
           aliveCounter = 0;
 
-          console.log("Starting HG");
           while (finish == false) { //game loop
             for (let g = 0; g < playersNo; g++) {
               gotChance[g] = false;
@@ -1150,8 +1149,8 @@ module.exports = {
             const dayConfirmation = await dayy.awaitMessageComponent({
               filter: dcollectorFilter,
               time: 300000  // 5 minutes
-            }).catch(() => {
-              console.log("Game timed out.")
+            }).catch((error) => {
+              console.error("Game timed out.", error);
               interaction.followUp({ content: "You silly goose, you made the game timeout. Ping scorp to fix.", components: [] });
               workingHG = false; // Reset the game state
             });
@@ -1429,10 +1428,10 @@ module.exports = {
                 const arenaConfirmation = await arenaa.awaitMessageComponent({
                   filter: dcollectorFilter,
                   time: 300000  // 5 minutes
-                }).catch(() => {
-                  console.log("Game timed out.")
+                }).catch((error) => {
+                  console.error("Game timed out.", error);
                   interaction.followUp({ content: "You silly goose, you made the game timeout. Ping scorp to fix.", components: [] });
-                  workingHG = false; // Reset the game state    
+                  workingHG = false; // Reset the game state
                 });
 
                 if (arenaConfirmation.customId === "next") {
@@ -1533,8 +1532,8 @@ module.exports = {
             const deathConfirmation = await deathh.awaitMessageComponent({
               filter: dcollectorFilter,
               time: 300000  // 5 minutes
-            }).catch(() => {
-              console.log("Game timed out.")
+            }).catch((error) => {
+              console.error("Game timed out.", error);
               interaction.followUp({ content: "You silly goose, you made the game timeout. Ping scorp to fix.", components: [] });
               workingHG = false; // Reset the game state
             });
@@ -1804,8 +1803,8 @@ module.exports = {
           const nighttConfirmation = await nightt.awaitMessageComponent({
               filter: dcollectorFilter,
               time: 300000  // 5 minutes
-            }).catch(() => {
-              console.log("Game timed out.")
+            }).catch((error) => {
+              console.error("Game timed out.", error);
               interaction.followUp({ content: "You silly goose, you made the game timeout. Ping scorp to fix.", components: [] });
               workingHG = false; // Reset the game state
           });
@@ -1834,7 +1833,6 @@ module.exports = {
 
             if (aliveCounter == 1) {
               finish = true;
-              console.log("Found Winner");
             } else if (aliveCounter == 0) {
               finish = true;
               botWon = true;
@@ -1878,7 +1876,6 @@ module.exports = {
             p = 0;
             arenaMsg = "";
             hasStart = false;
-            console.log("Ending HG");
           }
         } else {
           if(user.id == interaction.user.id){

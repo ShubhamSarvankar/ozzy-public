@@ -5,6 +5,18 @@ const levelModel = require("../models/levelSchema");
 module.exports = {
   name: Events.InteractionCreate,
   async execute(interaction) {
+    if (interaction.isAutocomplete()) {
+      const command = interaction.client.commands.get(interaction.commandName);
+      if (command?.autocomplete) {
+        try {
+          await command.autocomplete(interaction);
+        } catch (error) {
+          console.error(`Autocomplete failed for ${interaction.commandName}`, error);
+        }
+      }
+      return;
+    }
+
     if (!interaction.isChatInputCommand()) return;
 
     let levelData;

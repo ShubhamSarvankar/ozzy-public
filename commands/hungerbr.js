@@ -693,7 +693,7 @@ class BattleRoyale {
         try{
             await GAME_EVENTS[phaseName].execute(this, interaction);
         } catch(error) {
-            console.error("Error during transitioning.", error);
+            console.error(`Error during transitionTo [${phaseName}] (Ring ${this.ring}):`, error);
             workingHG = false;
             this.cleanupCollectors();
             interaction.channel.send({embeds: [crashEmbed]});
@@ -821,19 +821,16 @@ class BattleRoyale {
     
         // 1. Group squads by zone
         const squadsByZone = new Map();
-        console.log('Grouping squads by zone...');
-        
         this.squads.forEach(squad => {
             const alivePlayers = squad.players.filter(p => p.alive);
             console.log(`- Squad ${squad.id} has ${alivePlayers.length} alive players`);
-            
+
             if (alivePlayers.length > 0) {
                 const zone = alivePlayers[0].currentZone;
                 console.log(`  - Located in zone: ${zone}`);
-                
+
                 if (!squadsByZone.has(zone)) {
                     squadsByZone.set(zone, []);
-                    console.log(`  - New zone registry created for ${zone}`);
                 }
                 squadsByZone.get(zone).push({
                     id: squad.id,
@@ -988,14 +985,12 @@ class BattleRoyale {
     
     
         // 4. Clean up dead players
-        console.log('\nCleaning up eliminated players...');
         this.squads.forEach(squad => {
             const before = squad.players.length;
             squad.players = squad.players.filter(p => p.alive);
             console.log(`- Squad ${squad.id}: ${before} → ${squad.players.length} players`);
         });
-    
-        console.log('[BATTLE PHASE COMPLETE]');
+
         return {
             battleEmbed,  // Now guaranteed valid
             casualties
@@ -1169,22 +1164,17 @@ const GAME_EVENTS = {
                             if(i.customId === 'next'){
 
                                 await i.deferUpdate();
-                                console.log("STARTING DAY TRANSITION");
                                 game.phase = 'battle';
 
-                                
                                 try {
                                     await deathMessage.edit({
                                     embeds: [deathEmbed],
                                     components: [done]
                                     });
 
-                                    console.log("Before transitionTo");
-
                                     await game.transitionTo('battle', interaction);
-                                    console.log("After transitionTo");
                                 } catch(error){
-                                    console.error("Error during transitioning.", error);
+                                    console.error(`Error during ring stats transition (Ring ${game.ring}):`, error);
                                     workingHG = false;
                                     game.cleanupCollectors();
                                     interaction.channel.send({embeds: [crashEmbed]});
@@ -1212,11 +1202,11 @@ const GAME_EVENTS = {
                 
             } catch (error) {
 
-                console.error("Error during Ring", error);
+                console.error(`Error during ring phase (Ring ${game.ring}):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
-                
+
             }
         }
     },
@@ -1341,30 +1331,23 @@ const GAME_EVENTS = {
                                     if(i.customId === 'next'){
 
                                         await i.deferUpdate();
-                                        console.log("STARTING DAY TRANSITION");
                                         game.phase = 'ring';
 
-                                        
                                         try {
                                             await statsMessage.edit({
                                             embeds: [statsEmbed],
                                             components: [done]
                                             });
 
-                                            console.log("Before transitionTo");
-
                                             if(!game.checkWinner(interaction)){
                                                 if(!game.finalShowdown){
-
-                                            await game.transitionTo('ring', interaction);
+                                                    await game.transitionTo('ring', interaction);
                                                 } else{
                                                     await game.transitionTo('battle', interaction);
-
                                                 }
-                                            console.log("After transitionTo");
                                             }
                                         } catch(error){
-                                            console.error("Error during transitioning.", error);
+                                            console.error(`Error during battle stats transition (Ring ${game.ring}):`, error);
                                             workingHG = false;
                                             game.cleanupCollectors();
                                             interaction.channel.send({embeds: [crashEmbed]});
@@ -1396,11 +1379,11 @@ const GAME_EVENTS = {
                 
             } catch (error) {
 
-                console.error("Error during Ring", error);
+                console.error(`Error during battle phase (Ring ${game.ring}, ${Array.from(game.players.values()).filter(p => p.alive).length} alive):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
-                
+
             }
         }
     },
@@ -1458,15 +1441,10 @@ module.exports =  {
         const member = interaction.member;
         if (allowedRoles.some(roleId => member.roles.cache.has(roleId))) {
             hoster = interaction.user.id;
-            console.log('Hoster ID has been set:', hoster);
             if(!workingHG){
                 try{
 
-                    console.log(`test`);
-
                     const game = new BattleRoyale(hoster);
-
-                    console.log(`test`);
 
                     let startEmbed = new EmbedBuilder()
                         .setTitle("HG Battle Royale 🔮")
@@ -1525,43 +1503,32 @@ module.exports =  {
                     game.collectors.push(...[joinCollector, ozzyCollector, startCollector]);
 
                     joinCollector.on('collect', (reaction, user) => {
-                        console.log("We have started taking join reactions");
                         if (!game.players.has(user.id)) {
-                            console.log(`Player <@${user.id}> is joining the game...`);
-                            
-                            // Create new player
                             const newPlayer = new Player(user.id, user.displayAvatarURL());
                             game.players.set(user.id, newPlayer);
-                            
-                            // Squad allocation logic
+
                             let addedToSquad = false;
-                            
-                            // Try to add to existing squad with only 1 member
                             for (const [squadId, squad] of game.squads) {
-                                if (squad.players.length < 2) { // Max 2 players per squad
+                                if (squad.players.length < 2) {
                                     squad.players.push(newPlayer);
-                                    console.log(`Player <@${user.id}> added to squad ${squadId}`);
                                     addedToSquad = true;
                                     break;
                                 }
                             }
-                            
-                            // If no available squads, create new squad
+
                             if (!addedToSquad) {
                                 const squadId = `squad_${game.squads.size + 1}`;
                                 game.squads.set(squadId, {
                                     name: `Squad ${game.squads.size + 1}`,
                                     players: [newPlayer]
                                 });
-                                console.log(`Created new squad ${squadId} for player <@${user.id}>`);
                             }
-                            
+
                             game.updateLobbyMessage(message);
                         }
                     });
                     
                     ozzyCollector.on('collect', (reaction, user) => {
-                        console.log(`We have started taking Ozzy reactions!`);
                         if (!game.players.has(OZZY_ID) && user.id === game.hoster) {
                             const ozzyPlayer = new Player(OZZY_ID, ozzyAvatarURL);
                             game.players.set(OZZY_ID, ozzyPlayer);
@@ -1584,7 +1551,6 @@ module.exports =  {
                                 });
                             }
                             
-                            console.log(`Ozzy has joined the game.`);
                             game.updateLobbyMessage(message);
                         }
                     });
@@ -1594,9 +1560,7 @@ module.exports =  {
                         const validSquads = [...game.squads.values()].filter(squad => squad.players.length > 0);
                         
                         if (validSquads.length >= 2) {
-                            console.log(`We have ${validSquads.length} squads - ready to start`);
                             if (user.id === game.hoster) {
-                                console.log(`Game starting...`);
                                 game.phase = 'ring';
                                 try {
                                     game.transitionTo('ring', interaction);
@@ -1607,14 +1571,10 @@ module.exports =  {
                                     interaction.channel.send({embeds: [crashEmbed]});
                                 }
                             }
-                        } else {
-                            console.log(`Not enough squads to start (${validSquads.length} of 3 required)`);
                         }
                     });
                     
-                    // Keep your existing collector end handlers
                     startCollector.on("end", (collected, reason) => {
-                        console.log(`stopped join collect`);
                         if (game.phase === 'lobby') {
                             game.cleanupCollectors();
                             workingHG = false;
@@ -1623,11 +1583,9 @@ module.exports =  {
                     });
                     
                     ozzyCollector.on("end", (collect, reason) => {
-                        console.log(`stopped ozzy collect`);
                     });
-                    
+
                     startCollector.on("end", (collect, reason) => {
-                        console.log(`stopped start collect`);
                     });
 
                 } catch (error) {
@@ -1638,16 +1596,11 @@ module.exports =  {
 
             } else {
                 interaction.followUp('Another game was going on!');
-                console.log(`Another game was going on`);
-
             }
 
         } else {
             interaction.followUp('no');
-            console.log(`Member did not have perms.`);
         }
-
-        console.log(`This is the end of the code.`);
     }
 
 };

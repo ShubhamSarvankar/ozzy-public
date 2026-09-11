@@ -1,4 +1,4 @@
-// commands/attack.js
+﻿// commands/attack.js
 
 require('dotenv').config();
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
@@ -24,13 +24,14 @@ function pickGifUrlFor(userId) {
     : 'general';
   const list = manifest[tagKey];
   const publicId = list[Math.floor(Math.random() * list.length)];
-  return cloudinary.url(publicId, {
+  const url = cloudinary.url(publicId, {
     secure: true,
     resource_type: 'image',
     fetch_format: 'auto',
     quality: 'auto',
     format: "gif"
   });
+  return url;
 }
 
 module.exports = {
@@ -76,24 +77,28 @@ module.exports = {
       .setColor(embedColor)
       .setTimestamp();
 
-    if (targetIds.length) {
-      // fetch usernames for embed description
-      const users = await Promise.all(
-        targetIds.map(id => interaction.client.users.fetch(id).catch(() => null))
-      );
-      const validUsers = users.filter(u => u);
-      const mentions = validUsers.map(u => `<@${u.id}>`).join(' ');
-      const names = validUsers.map(u => `**${u.username}**`).join(', ');
+    try {
+      if (targetIds.length) {
+        // fetch usernames for embed description
+        const users = await Promise.all(
+          targetIds.map(id => interaction.client.users.fetch(id).catch(() => null))
+        );
+        const validUsers = users.filter(u => u);
+        const mentions = validUsers.map(u => `<@${u.id}>`).join(' ');
+        const names = validUsers.map(u => `**${u.username}**`).join(', ');
 
-      embed.setDescription(`**${me.username}** attacks ${names}!`);
-      await interaction.reply({
-        content: mentions,
-        embeds: [embed],
-      });
-    } else {
-      // general chat attack
-      embed.setDescription(`**${me.username}** attacks the entire general chat!`);
-      await interaction.reply({ embeds: [embed] });
+        embed.setDescription(`**${me.username}** attacks ${names}!`);
+        await interaction.reply({
+          content: mentions,
+          embeds: [embed],
+        });
+      } else {
+        // general chat attack
+        embed.setDescription(`**${me.username}** attacks the entire general chat!`);
+        await interaction.reply({ embeds: [embed] });
+      }
+    } catch (err) {
+      console.error(`[attack] reply failed | gifUrl=${gifUrl} | error=${err.message}`, err);
     }
   },
 };

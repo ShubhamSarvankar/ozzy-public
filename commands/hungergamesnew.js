@@ -1551,12 +1551,11 @@ class GameState {
 
     updateLobbyMessage (message) {
         if(this.phase === 'lobby'){
-            console.log(`Updating lobby message`);
                 try {
                     const playerList = Array.from(this.players.values())
                         .map(p => `<@${p.id}>`)
                         .join('\n');
-                    
+
                     const embed = new EmbedBuilder()
                         .setTitle(`Lobby (${this.players.size}/15)`)
                         .setDescription(
@@ -1565,11 +1564,10 @@ class GameState {
                             `${joinEmoji} Join | ${startEmoji} Begin`
                         )
                         .setColor(0x953d59);
-    
+
                     message.edit({
                         embeds: [embed],
                     });
-                    console.log("Lobby message updated successfully.");
                 } catch (error) {
                     console.error("Error updating lobby message:", error);
                 }
@@ -1584,7 +1582,7 @@ class GameState {
         try{
             await GAME_EVENTS[phaseName].execute(this, interaction);
         } catch(error) {
-            console.error("Error during transitioning.", error);
+            console.error(`Error during transitionTo [${phaseName}] (Round ${this.round}):`, error);
             workingHG = false;
             this.cleanupCollectors();
             interaction.channel.send({embeds: [crashEmbed]});
@@ -1613,12 +1611,11 @@ class GameState {
                 embeds:[winnerEmbed]
             });
 
-            console.log(`Hunger games ended.`);
             workingHG = false;
             this.cleanupCollectors();
 
             return true;
-        
+
         } else if (alivePlayers.length === 0) {
 
             const allDeadEmbed = new EmbedBuilder()
@@ -1631,12 +1628,11 @@ class GameState {
                 embeds:[allDeadEmbed]
             });
 
-            console.log(`Hunger games ended.`);
             workingHG = false;
             this.cleanupCollectors();
 
             return true;
-            
+
         }
         return null; // More than one player alive, no winner yet
     }
@@ -1798,28 +1794,23 @@ const GAME_EVENTS = {
                                     if(i.customId === 'next'){
 
                                         await i.deferUpdate();
-                                        console.log("STARTING DAY TRANSITION");
                                         game.phase = 'day';
 
-                                        
                                         try {
                                             await statsMessage.edit({
                                             embeds: [statsEmbed],
                                             components: [done]
                                             });
 
-                                            console.log("Before transitionTo");
-
                                             if (!game.checkWinner(interaction)) {
                                                 await game.transitionTo('day', interaction);
                                             }
-                                            console.log("After transitionTo");
                                         } catch(error){
-                                            console.error("Error during transitioning.", error);
+                                            console.error(`Error during cornucopia stats transition (Round ${game.round}):`, error);
                                             workingHG = false;
                                             game.cleanupCollectors();
                                             interaction.channel.send({embeds: [crashEmbed]});
-                                        }    
+                                        }
                                     }
                                 })
 
@@ -1844,7 +1835,7 @@ const GAME_EVENTS = {
                 });
 
             } catch (error) {
-                console.error("Error during Cornucopia", error);
+                console.error(`Error during cornucopia phase (Round ${game.round}):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
@@ -1860,14 +1851,10 @@ const GAME_EVENTS = {
     day: {
 
         execute: async(game, interaction) => {
-            console.log("STARTING DAY", game.round);
             try{
 
-                
                 game.round++;
-                console.log("Day round updated to", game.round);
                 const alivePlayers = Array.from(game.players.values()).filter(p => p.alive);
-                console.log("Alive Players", alivePlayers.length);
 
                 if(alivePlayers.length === 2){
                     // end game logic
@@ -2077,14 +2064,12 @@ const GAME_EVENTS = {
                                                         await game.transitionTo('night', interaction);
                                                     }
 
-                                               
-                                                    
                                                } catch(error){
-                                                console.error("Error during transitioningxxxxo.", error);
+                                                console.error(`Error during day-end stats transition (Round ${game.round}):`, error);
                                                 workingHG = false;
                                                 game.cleanupCollectors();
                                                 interaction.channel.send({embeds: [crashEmbed]});
-                                               }    
+                                               }
                                             }
                                         })
 
@@ -2256,7 +2241,7 @@ const GAME_EVENTS = {
                                                 }
                                                 
                                                } catch(error){
-                                                console.error("Error during transitioningxxxxo.", error);
+                                                console.error(`Error during day-end stats transition B (Round ${game.round}):`, error);
                                                 workingHG = false;
                                                 game.cleanupCollectors();
                                                 interaction.channel.send({embeds: [crashEmbed]});
@@ -2296,7 +2281,7 @@ const GAME_EVENTS = {
 
 
             } catch (error) {
-                console.error(`Error during Day ${game.round}`, error);
+                console.error(`Error during day phase (Round ${game.round}, ${Array.from(game.players.values()).filter(p => p.alive).length} alive):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
@@ -2311,9 +2296,7 @@ const GAME_EVENTS = {
         execute: async(game, interaction) => {
             try{
 
-                console.log("Day round updated to", game.round);
                 const alivePlayers = Array.from(game.players.values()).filter(p => p.alive);
-                console.log("Alive Players", alivePlayers.length);
 
                 const weaponAssignments = [];
                 const casualties = [];
@@ -2437,10 +2420,8 @@ const GAME_EVENTS = {
                                     if(i.customId === 'next'){
 
                                         await i.deferUpdate();
-                                        console.log("STARTING NIGHT TRANSITION");
                                         game.phase = 'undecided';
 
-                                        
                                         try {
                                             await statsMessage.edit({
                                             embeds: [statsEmbed],
@@ -2448,8 +2429,6 @@ const GAME_EVENTS = {
                                             });
 
                                             if (game.checkWinner(interaction)) return;
-
-                                            console.log("Before transitionTo");
 
                                             if(game.round % 2 === 0){
                                                 const randomNimbooz = Math.floor(Math.random() * 2);
@@ -2464,13 +2443,10 @@ const GAME_EVENTS = {
                                             } else {
                                                 game.phase = 'day';
                                                 await game.transitionTo('day', interaction);
-
                                             }
 
-
-                                            console.log("After transitionTo");
                                         } catch(error){
-                                            console.error("Error during transitioning.", error);
+                                            console.error(`Error during night stats transition (Round ${game.round}):`, error);
                                             workingHG = false;
                                             game.cleanupCollectors();
                                             interaction.channel.send({embeds: [crashEmbed]});
@@ -2499,14 +2475,14 @@ const GAME_EVENTS = {
                 });
 
             } catch (error) {
-                console.error("Error during Cornucopia", error);
+                console.error(`Error during night phase (Round ${game.round}, ${Array.from(game.players.values()).filter(p => p.alive).length} alive):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
             }
         }
 
-        
+
     },
 
     feast: {
@@ -2514,9 +2490,7 @@ const GAME_EVENTS = {
         execute: async(game, interaction) => {
             try{
 
-                console.log("THE FEAST", game.round);
                 const alivePlayers = Array.from(game.players.values()).filter(p => p.alive);
-                console.log("Alive Players", alivePlayers.length);
 
                 const weaponAssignments = [];
                 const casualties = [];
@@ -2634,29 +2608,23 @@ const GAME_EVENTS = {
                                     if(i.customId === 'next'){
 
                                         await i.deferUpdate();
-                                        console.log("STARTING DAY TRANSITION");
                                         game.phase = 'day';
 
-                                        
                                         try {
                                             await statsMessage.edit({
                                             embeds: [statsEmbed],
                                             components: [done]
                                             });
 
-                                            console.log("Before transitionTo");
-
                                             if (!game.checkWinner(interaction)) {
                                                 await game.transitionTo('day', interaction);
                                             }
-
-                                            console.log("After transitionTo");
                                         } catch(error){
-                                            console.error("Error during transitioning.", error);
+                                            console.error(`Error during feast stats transition (Round ${game.round}):`, error);
                                             workingHG = false;
                                             game.cleanupCollectors();
                                             interaction.channel.send({embeds: [crashEmbed]});
-                                        }    
+                                        }
                                     }
                                 })
 
@@ -2681,14 +2649,14 @@ const GAME_EVENTS = {
                 });
 
             } catch (error) {
-                console.error("Error during Cornucopia", error);
+                console.error(`Error during feast phase (Round ${game.round}, ${Array.from(game.players.values()).filter(p => p.alive).length} alive):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
             }
         }
 
-        
+
     },
 
     bloodbath: {
@@ -2696,9 +2664,7 @@ const GAME_EVENTS = {
         execute: async(game, interaction) => {
             try{
 
-                console.log("THE BLOODYBOY", game.round);
                 const alivePlayers = Array.from(game.players.values()).filter(p => p.alive);
-                console.log("Alive Players", alivePlayers.length);
 
                 const weaponAssignments = [];
                 const casualties = [];
@@ -2816,29 +2782,23 @@ const GAME_EVENTS = {
                                     if(i.customId === 'next'){
 
                                         await i.deferUpdate();
-                                        console.log("STARTING DAY TRANSITION");
                                         game.phase = 'day';
 
-                                        
                                         try {
                                             await statsMessage.edit({
                                             embeds: [statsEmbed],
                                             components: [done]
                                             });
 
-                                            console.log("Before transitionTo");
-
                                             if (!game.checkWinner(interaction)) {
                                                 await game.transitionTo('day', interaction);
                                             }
-
-                                            console.log("After transitionTo");
                                         } catch(error){
-                                            console.error("Error during transitioning.", error);
+                                            console.error(`Error during bloodbath stats transition (Round ${game.round}):`, error);
                                             workingHG = false;
                                             game.cleanupCollectors();
                                             interaction.channel.send({embeds: [crashEmbed]});
-                                        }    
+                                        }
                                     }
                                 })
 
@@ -2863,7 +2823,7 @@ const GAME_EVENTS = {
                 });
 
             } catch (error) {
-                console.error("Error during Cornucopia", error);
+                console.error(`Error during bloodbath phase (Round ${game.round}, ${Array.from(game.players.values()).filter(p => p.alive).length} alive):`, error);
                 workingHG = false;
                 game.cleanupCollectors();
                 interaction.channel.send({embeds: [crashEmbed]});
@@ -2931,15 +2891,10 @@ module.exports =  {
         const member = interaction.member;
         if (allowedRoles.some(roleId => member.roles.cache.has(roleId))){
             hoster = interaction.user.id;
-            console.log('Hoster ID has been set:', hoster);
             if(!workingHG){
                 try{
 
-                    console.log(`test`);
-
                     const game = new GameState(hoster);
-
-                    console.log(`test`);
 
                     let startEmbed = new EmbedBuilder()
                         .setTitle("Hunger Games")
@@ -2999,10 +2954,8 @@ module.exports =  {
                     game.collectors.push(...[joinCollector, ozzyCollector, startCollector]);
 
                     joinCollector.on('collect', (reaction, user) => {
-                        console.log("We have started taking join reactions");
 
                         if (game.players.size === 15) {
-                            console.log(`Lobby is full with 12 players. Starting the game automatically.`);
                             game.phase = 'cornucopia';
                             try {
                                 game.transitionTo('cornucopia', interaction);
@@ -3016,30 +2969,22 @@ module.exports =  {
 
                         
                         if(!game.players.has(user.id)){
-                            console.log(`Player <@${user.id}> is joining the game...`);
                             game.players.set(user.id, new Player (user.id, user.displayAvatarURL()));
-                            console.log(`Player <@${user.id}> has joined the game!`);
-                            game.updateLobbyMessage(message);    
-
+                            game.updateLobbyMessage(message);
                         }
 
                     });
 
                     ozzyCollector.on('collect', (reaction, user) => {
-                        console.log(`We have started taking Ozzy reactions!`);
                         if(!game.players.has(OZZY_ID) && user.id === game.hoster){
                             game.players.set(OZZY_ID, new Player (OZZY_ID, ozzyAvatarURL));
-                            console.log(`Ozzy has joined the game.`);
                             game.updateLobbyMessage(message);
-
                         }
                     });
 
                     startCollector.on('collect', (reaction, user) => {
                         if(game.players.size >= 2){
-                            console.log(`We are starting the game almost.`);
                             if(user.id === game.hoster){
-                                console.log(`We started.`);
                                 game.phase = 'cornucopia';
                                 try{
                                     game.transitionTo('cornucopia', interaction);
@@ -3055,7 +3000,6 @@ module.exports =  {
                     });
 
                     startCollector.on("end", (collected, reason) =>{
-                        console.log(`stopped join collect`);
                         if(game.phase === 'lobby'){
                             game.cleanupCollectors();
                             workingHG = false;
@@ -3064,11 +3008,9 @@ module.exports =  {
                     });
 
                     ozzyCollector.on("end", (collect, reason) => {
-                        console.log(`stopped ozzy collect`);
                     });
 
                     startCollector.on("end", (collect, reason) => {
-                        console.log(`stopped start collect`);
                     });
 
                 } catch (error) {
@@ -3079,16 +3021,11 @@ module.exports =  {
 
             } else {
                 interaction.followUp('Another game was going on!');
-                console.log(`Another game was going on`);
-
             }
 
         } else {
             interaction.followUp('no');
-            console.log(`Member did not have perms.`);
         }
-
-        console.log(`This is the end of the code.`);
     }
 
 };

@@ -7,7 +7,9 @@ const {
   ButtonStyle,
 } = require('discord.js');
 const profileModel = require("../models/profileSchema");
+const sapphireLogModel = require('../models/sapphireLogSchema');
 const { DB, updateWeeklySapphires } = require('../database/weeklySapphires');
+const { incSapphires } = require('../utils/weeklyStats');
 const { createNationalDebtSession } = require('../payments/createNationalDebtSession');
 
 const sph = '<:Sapphires:792479793756110868>';
@@ -134,6 +136,25 @@ module.exports = {
     )
     .addSubcommand((subcommand) =>
       subcommand
+        .setName('logs')
+        .setDescription('View recent sapphire logs')
+        .addUserOption(option =>
+          option
+            .setName('user')
+            .setDescription('View logs for a specific user')
+            .setRequired(false)
+        )
+        .addIntegerOption(option =>
+          option
+            .setName('limit')
+            .setDescription('Number of logs to fetch')
+            .setRequired(false)
+            .setMinValue(1)
+            .setMaxValue(25)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
         .setName('nationaldebt')
         .setDescription('See the national debt of the Motherland, owed to Scorp and Ayan')
     ),
@@ -180,6 +201,16 @@ module.exports = {
           profile.sapphires += amount;
           await profile.save();
           await updateWeeklySapphires(user.id, amount); // Update weekly sapphires
+          await incSapphires(user.id, amount); // dual write — new period-based weekly stats
+          await sapphireLogModel.create({
+            userId: user.id,
+            serverId: interaction.guild.id,
+            amount,
+            source: 'admin_command',
+            adminId: interaction.user.id,
+            channelId: interaction.channel.id,
+            reason: 'Manual sapphire grant',
+          });
 
           const embed = new EmbedBuilder()
             .setTitle('Sapphires Added')
@@ -204,6 +235,7 @@ module.exports = {
           if (profile.sapphires < 0) profile.sapphires = 0; // Ensure balance does not go negative
           await profile.save();
           await updateWeeklySapphires(user.id, -amount); // Update weekly sapphires
+          await incSapphires(user.id, -amount); // dual write — clamped at zero internally
 
           const embed = new EmbedBuilder()
             .setTitle('Sapphires Subtracted')
@@ -238,7 +270,8 @@ module.exports = {
         }
     
         await updateWeeklySapphires(user.id, amount); // Update weekly sapphires
-    
+        await incSapphires(user.id, amount); // dual write — new period-based weekly stats
+
         const embed = new EmbedBuilder()
           .setTitle('Weekly Sapphires Updated')
           .setColor('#00FF00')
@@ -271,7 +304,8 @@ module.exports = {
         }
     
         await updateWeeklySapphires(user.id, -amount); // Subtract from weekly sapphires
-    
+        await incSapphires(user.id, -amount); // dual write — clamped at zero internally
+
         const embed = new EmbedBuilder()
           .setTitle('Weekly Sapphires Updated')
           .setColor('#FF0000')
@@ -318,6 +352,15 @@ module.exports = {
         try {
           profile.sapphires += amount;
           await profile.save();
+          await sapphireLogModel.create({
+            userId: profile.userId,
+            serverId: interaction.guild.id,
+            amount,
+            source: 'admin_command',
+            adminId: interaction.user.id,
+            channelId: interaction.channel.id,
+            reason: `Role add for role ${targetRole.id}`,
+          });
           counter++;
 
           // 5️⃣ Promotion check
@@ -379,6 +422,16 @@ module.exports = {
           profile.sapphires += amount;
           await profile.save();
           await updateWeeklySapphires(userId, amount);
+          await incSapphires(userId, amount); // dual write — new period-based weekly stats
+          await sapphireLogModel.create({
+            userId,
+            serverId: interaction.guild.id,
+            amount,
+            source: 'admin_command',
+            adminId: interaction.user.id,
+            channelId: interaction.channel.id,
+            reason: 'Mass sapphire grant',
+          });
 
           const member = await interaction.guild.members
             .fetch(userId)
@@ -425,6 +478,50 @@ module.exports = {
         } else {
           await interaction.followUp({ embeds: chunk });
         }
+      }
+    }
+
+    if (adminSubcommand === 'logs') {
+      try {
+        await DB.connect();
+
+        const targetUser = interaction.options.getUser('user');
+        const limit = interaction.options.getInteger('limit') ?? 10;
+
+        const query = {
+          serverId: interaction.guild.id,
+        };
+
+        if (targetUser) {
+          query.userId = targetUser.id;
+        }
+
+        const logs = await sapphireLogModel
+          .find(query)
+          .sort({ createdAt: -1 })
+          .limit(limit);
+
+        if (!logs.length) {
+          return await interaction.editReply('No sapphire logs found.');
+        }
+
+        const description = logs.map((log) => {
+          const timestamp = `<t:${Math.floor(new Date(log.createdAt).getTime() / 1000)}:f>`;
+          const adminText = log.adminId ? ` | admin: <@${log.adminId}>` : '';
+          const messageText = log.messageId ? ` | msg: \`${log.messageId}\`` : '';
+          const reasonText = log.reason ? ` | ${log.reason}` : '';
+          return `${timestamp}\n<@${log.userId}> | +${log.amount} | ${log.source}${adminText}${messageText}${reasonText}`;
+        }).join('\n\n');
+
+        const embed = new EmbedBuilder()
+          .setTitle(targetUser ? `Sapphire Logs for ${targetUser.tag}` : 'Recent Sapphire Logs')
+          .setColor('#0099FF')
+          .setDescription(description);
+
+        await interaction.editReply({ embeds: [embed] });
+      } catch (error) {
+        console.error('An error occurred while fetching sapphire logs:', error);
+        await interaction.editReply('An error occurred while executing this command.');
       }
     }
 

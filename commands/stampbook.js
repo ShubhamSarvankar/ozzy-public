@@ -4,6 +4,7 @@ const { GlobalFonts } = Canvas;
 const path = require('path');
 const fs = require('fs').promises;
 const StampModel = require('../models/stampSchema');
+const { incStamps } = require('../utils/weeklyStats');
 
 const generalChannelID = '653292446779834398'
 
@@ -609,6 +610,12 @@ async function addStamp(interaction, user, stampName) {
     userStampData.stamps.push(stampName);
     await userStampData.save();
 
+    try {
+        await incStamps(userId, 1);
+    } catch (err) {
+        console.error('[weeklyStats] stamp increment failed:', err);
+    }
+
     // Reply to the invoker
     await interaction.reply(`The "${stampName}" stamp has been added to ${user.username}.`);
 
@@ -626,6 +633,12 @@ async function removeStamp(interaction, user, stampName) {
 
     userStampData.stamps = userStampData.stamps.filter(stamp => stamp !== stampName);
     await userStampData.save();
+
+    try {
+        await incStamps(userId, -1); // clamped at zero internally
+    } catch (err) {
+        console.error('[weeklyStats] stamp decrement failed:', err);
+    }
 
     await interaction.reply(`The "${stampName}" stamp has been removed from ${user.username}.`);
 }

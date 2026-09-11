@@ -1,34 +1,49 @@
 const { Events } = require('discord.js');
 const levelModel = require('../models/levelSchema');
 const profileModel = require('../models/profileSchema'); // Import profile schema
+const { incMessages } = require('../utils/weeklyStats');
+const { incMonthlyMessages } = require('../utils/monthlyMessages');
+const { trackedChannels } = require('../config');
+const { totalXpRequired } = require('../utils/levels');
+const { isCountableLiveMessage } = require('../utils/messageFilters');
 
 const excludedChannels = ['1003344528251568148']; // Replace with actual channel IDs
 
 const cooldowns = new Map();
 
-const totalXpRequired = [
-  0, 100, 255, 475, 770, 1150, 1625, 2205, 2900, 3720, 4675, 5775, 7030, 8450, 10045, 11825, 13800, 15980, 18375, 20995,
-  23850, 26950, 30305, 33925, 37820, 42000, 46475, 51255, 56350, 61770, 67525, 73625, 80080, 86890, 94075, 101635, 109580,
-  117920, 126665, 135825, 145410, 155430, 165895, 176815, 188200, 200060, 212405, 225245, 238590, 252450, 266835, 281755,
-  297220, 313240, 329825, 346985, 364730, 383070, 402015, 421575, 441760, 462580, 484045, 506165, 528950, 552410, 576555,
-  601395, 626940, 653200, 680185, 707905, 736370, 765590, 795575, 826335, 857880, 890220, 923365, 957325, 992110, 1027720,
-  1064075, 1101265, 1139290, 1178150, 1217845, 1258375, 1299740, 1341940, 1384975, 1428845, 1473550, 1519090, 1565465,
-  1612675, 1660720, 1709600, 1759315, 1809865, 1861250, 1913470, 1966525, 2020415, 2075140, 2130700, 2187095, 2244325,
-  2302390, 2361290, 2421025, 2481595, 2543000, 2605240, 2668315, 2732225, 2796970, 2862550, 2928965, 2996215, 3064300,
-  3133220, 3202975, 3273565, 3344990, 3417250, 3490345, 3564275, 3639040, 3714640, 3791075, 3868345, 3946450, 4025390,
-  4105165, 4185775, 4267220, 4349500, 4432615, 4516565, 4601350, 4686970, 4773425, 4860715, 4948840, 5037800, 5127595,
-  5218225, 5309690, 5401990, 5495125, 5589095, 5683900, 5779540, 5876015, 5973325, 6071470, 6170450, 6260265, 6360915,
-  6462400, 6564720, 6667875, 6771865, 6876690, 6982350, 7088845, 7196175, 7304340, 7413340, 7523175, 7633845, 7745350,
-  7857690, 7970865, 8084875, 8199720, 8315400, 8431915, 8549265, 8667450, 8786470, 8906325, 9027015, 9148540, 9270900
-];
-
 module.exports = {
   name: Events.MessageCreate,
   async execute(message) {
     if (message.author.bot) return;
+    if (message.webhookId) return;
+
+    const msg = message.content.trim().toLowerCase();
+
+    // Weekly + permanent monthly message counters — must run before every
+    // other early return below (army commands, excludedChannels, the XP
+    // cooldown). The XP cooldown especially would otherwise cap counted
+    // messages at 1/minute, exactly the useless number MEE6 produces. A
+    // stats failure here must never break the message handling that follows.
+    // Filtering (bots, webhooks, system messages, prefix commands) lives in
+    // utils/messageFilters.js, shared with the historical crawl so the two
+    // can never silently diverge (scope.md §3.6).
+    //
+    // incMonthlyMessages writes to a permanent, never-reset collection
+    // (unlike weeklyStats, which /lbweekly reset wipes) — it's the only
+    // source of post-crawl-boundary data for commands/activeweek.js, and has
+    // to be bucketed by month from the start so it stays queryable that way
+    // indefinitely into the future.
+    try {
+      const isThread = message.channel.isThread();
+      const isTracked = !isThread && trackedChannels.includes(message.channel.id);
+      if (isTracked && isCountableLiveMessage(message)) {
+        await Promise.all([incMessages(message.author.id), incMonthlyMessages(message.author.id)]);
+      }
+    } catch (err) {
+      console.error('[weeklyStats] message counter failed:', err);
+    }
 
     // Army HF/HFS GIF commands
-    const msg = message.content.trim().toLowerCase();
     if (msg === '!army hfs') {
       return message.channel.send(
         'https://cdn.discordapp.com/attachments/769576548457644092/1380917424400109698/ArmyHFS.gif?ex=68459f12&is=68444d92&hm=eba07e54e986aef352ad81862b2b5b6d6b33c3eb93aed650d8edc5ac3741e11a&'
@@ -78,7 +93,7 @@ module.exports = {
       if (levelData.xp >= totalXPForNextLevel) {
         levelData.level += 1;
         console.log(`Level up! ${message.author.tag}'s new level is ${levelData.level}.`);
-        message.channel.send(`Congratulations ${message.author}, your HF syndrome has reached level ${levelData.level}! Let's throw them into the river!`);
+        message.channel.send(`Congratulations ${message.author}, your HF syndrome has reached level ${levelData.level}! Elp is the greatest <:elpisthegreatest:828247385552846848>`);
       }
 
       await levelData.save();

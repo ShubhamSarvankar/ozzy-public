@@ -1,48 +1,42 @@
 // startup.js
-const { exec } = require('child_process');
-const path = require('path');
+const { exec, spawn } = require('child_process');
 
-console.log('Starting bot deployment process...');
+const RESTART_DELAY_MS = 5000;
 
-// Function to run a command and return a promise
-function runCommand(command) {
+function deployCommands() {
   return new Promise((resolve, reject) => {
-    const process = exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing command: ${command}`);
-        console.error(stderr);
-        reject(error);
-        return;
-      }
-      console.log(stdout);
-      resolve();
+    const proc = exec('node deploy-commands.js', (error) => {
+      if (error) reject(error);
+      else resolve();
     });
-
-    // Forward child process output in real-time
-    process.stdout.on('data', (data) => {
-      console.log(data.toString());
-    });
-
-    process.stderr.on('data', (data) => {
-      console.error(data.toString());
-    });
+    proc.stdout.on('data', (d) => process.stdout.write(d));
+    proc.stderr.on('data', (d) => process.stderr.write(d));
   });
 }
 
-async function startBot() {
+function runBot() {
+  console.log('Starting bot...');
+  const child = spawn('node', ['index.js'], { stdio: 'inherit' });
+
+  child.on('close', (code) => {
+    if (code === 0) {
+      console.log('[WATCHDOG] Bot exited cleanly. Not restarting.');
+      return;
+    }
+    console.error(`[WATCHDOG] Bot exited with code ${code}. Restarting in ${RESTART_DELAY_MS / 1000}s...`);
+    setTimeout(runBot, RESTART_DELAY_MS);
+  });
+}
+
+async function main() {
   try {
-    // First deploy commands
     console.log('Deploying commands...');
-    await runCommand('node deploy-commands.js');
-    
-    // Then start the bot
-    console.log('Starting bot...');
-    await runCommand('node index.js');
-    
+    await deployCommands();
+    runBot();
   } catch (error) {
     console.error('Startup failed:', error);
     process.exit(1);
   }
 }
 
-startBot();
+main();

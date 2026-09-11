@@ -2,8 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed
 
 const gameStorage = new Map(); // To store game details and player choices
 
-const VISITOR_ROLE_ID = '653261692867837971';
-const ALWAYS_WIN_USER_ID = '221783949461028864';
+const THE_GREAT_LICE_ID = '416685672175239168';
 
 const choices = ['rock', 'paper', 'scissors'];
 const createButton = (label, style, customId) =>
@@ -26,26 +25,6 @@ function getNormalWinner(playerOne, playerTwo, choiceOne, choiceTwo) {
     (choiceOne === 'paper' && choiceTwo === 'rock') ||
     (choiceOne === 'scissors' && choiceTwo === 'paper')
   ) ? playerOne : playerTwo;
-}
-
-// Applies visitor role disadvantage when exactly one player is a visitor
-// Visitor can only win with scissors vs paper; any other non-tie outcome becomes a visitor loss
-function getAdjustedWinner(playerOne, playerTwo, choiceOne, choiceTwo, visitorId) {
-  // Tie: visitor wins against a non-visitor
-  if (choiceOne === choiceTwo) return visitorId;
-
-  const normalWinner = getNormalWinner(playerOne, playerTwo, choiceOne, choiceTwo);
-  const nonVisitorId = visitorId === playerOne ? playerTwo : playerOne;
-  const visitorChoice = visitorId === playerOne ? choiceOne : choiceTwo;
-  const nonVisitorChoice = visitorId === playerOne ? choiceTwo : choiceOne;
-
-  // The only winning condition allowed for the visitor: scissors vs paper
-  if (visitorChoice === 'scissors' && nonVisitorChoice === 'paper') {
-    return visitorId; // visitor's one legitimate win
-  }
-
-  // All other non-tie outcomes: visitor loses
-  return nonVisitorId;
 }
 
 module.exports = {
@@ -80,23 +59,17 @@ module.exports = {
         return;
       }
 
+      if (playerOne.id === THE_GREAT_LICE_ID || playerTwo.id === THE_GREAT_LICE_ID) {
+        await interaction.reply('Your greatness is not enough to challenge the Great Lice');
+        return;
+      }
+
       // Create a unique game ID
       const gameId = `${playerOne.id}-${playerTwo.id}-${Date.now()}`;
 
-      // Resolve GuildMembers to check roles
-      const guild = interaction.guild;
-      const memberOne = await guild.members.fetch(playerOne.id).catch(() => null);
-      const memberTwo = await guild.members.fetch(playerTwo.id).catch(() => null);
-
-      const oneIsVisitor = memberOne?.roles.cache.has(VISITOR_ROLE_ID) ?? false;
-      const twoIsVisitor = memberTwo?.roles.cache.has(VISITOR_ROLE_ID) ?? false;
-
-      // Initialize game storage, recording visitor status at game creation time
       gameStorage.set(gameId, {
         players: [playerOne.id, playerTwo.id],
-        choices: {},
-        oneIsVisitor,
-        twoIsVisitor
+        choices: {}
       });
 
       await interaction.reply(`Rock Paper Scissors game started between <@${playerOne.id}> and <@${playerTwo.id}>! If you're not a chicken, accept the challenge using \`/rps accept\`.`);
@@ -152,27 +125,13 @@ module.exports = {
           const choiceOne = game.choices[playerOne];
           const choiceTwo = game.choices[playerTwo];
 
-          const { oneIsVisitor, twoIsVisitor } = game;
+          const isTie = choiceOne === choiceTwo;
+          const winner = isTie ? null : getNormalWinner(playerOne, playerTwo, choiceOne, choiceTwo);
 
-          // Determine which result path to use:
-          // - Exactly one visitor vs one non-visitor: apply disadvantage
-          // - Both visitors or neither: normal rules
-          const applyDisadvantage = (oneIsVisitor && !twoIsVisitor) || (!oneIsVisitor && twoIsVisitor);
-          const visitorId = oneIsVisitor ? playerOne : playerTwo;
-
-          let result = '';
-          if (game.players.includes(ALWAYS_WIN_USER_ID)) {
-            const winner = ALWAYS_WIN_USER_ID;
-            result = `<@${winner}> wins! <@${playerOne}> chose **${choiceOne.charAt(0).toUpperCase() + choiceOne.slice(1)}** and <@${playerTwo}> chose **${choiceTwo.charAt(0).toUpperCase() + choiceTwo.slice(1)}**.`;
-          } else if (applyDisadvantage) {
-            const winner = getAdjustedWinner(playerOne, playerTwo, choiceOne, choiceTwo, visitorId);
-            result = `<@${winner}> wins! <@${playerOne}> chose **${choiceOne.charAt(0).toUpperCase() + choiceOne.slice(1)}** and <@${playerTwo}> chose **${choiceTwo.charAt(0).toUpperCase() + choiceTwo.slice(1)}**.`;
-          } else if (choiceOne === choiceTwo) {
-            result = `It's a tie! Both players chose **${choiceOne.charAt(0).toUpperCase() + choiceOne.slice(1)}**.`;
-          } else {
-            const winner = getNormalWinner(playerOne, playerTwo, choiceOne, choiceTwo);
-            result = `<@${winner}> wins! <@${playerOne}> chose **${choiceOne.charAt(0).toUpperCase() + choiceOne.slice(1)}** and <@${playerTwo}> chose **${choiceTwo.charAt(0).toUpperCase() + choiceTwo.slice(1)}**.`;
-          }
+          const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+          let result = isTie
+            ? `It's a tie! Both players chose **${capitalize(choiceOne)}**.`
+            : `<@${winner}> wins! <@${playerOne}> chose **${capitalize(choiceOne)}** and <@${playerTwo}> chose **${capitalize(choiceTwo)}**.`;
 
           await interaction.followUp({
             content: 'Results are in!',
