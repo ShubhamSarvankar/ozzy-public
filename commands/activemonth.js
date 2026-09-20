@@ -58,6 +58,12 @@ module.exports = {
       .map(([monthKey, count], i) => `**${i + 1}.** ${formatMonthKey(monthKey)} — ${count.toLocaleString('en-US')}`)
       .join('\n');
 
+    // Same 'YYYY-MM', UTC key format as monthTotals itself (see
+    // monthlyMessagesSchema.js) — falls back to 0 if nothing's been
+    // recorded for the current month yet.
+    const currentMonthKey = new Date().toISOString().slice(0, 7);
+    const currentMonthCount = monthTotals.get(currentMonthKey) || 0;
+
     const embed = new EmbedBuilder()
       .setTitle(`📅 ${user.username}'s Most Active Month`)
       .setThumbnail(user.displayAvatarURL({ extension: 'png', size: 128 }))
@@ -65,6 +71,7 @@ module.exports = {
       .addFields(
         { name: 'Most active month', value: formatMonthKey(bestMonth), inline: true },
         { name: 'Messages that month', value: bestCount.toLocaleString('en-US'), inline: true },
+        { name: 'Messages this month', value: currentMonthCount.toLocaleString('en-US'), inline: true },
         { name: 'All-time messages', value: totalMessages.toLocaleString('en-US'), inline: true },
         { name: 'Top months', value: top5 }
       );
