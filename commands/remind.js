@@ -15,16 +15,34 @@ const CONFIRM_TIMEOUT_MS = 60000;
 const MODAL_TIMEOUT_MS = 300000;
 const MAX_ACTIVE_PER_USER = 50;
 
-const SHORT_GUIDE = [
-  '**Quick guide to `/remind`:**',
-  '`/remind channel create` — remind this channel (optionally pinging a user or role)',
-  '`/remind dm create` — remind yourself or another user by DM',
-  '`/remind list` (or `/reminders`) — see your active reminders',
-  '`/remind edit|delete|pause|resume <id>` — manage an existing reminder',
-  '`/remind timezone set|show` — set your timezone so natural-language times resolve correctly',
-  '',
-  'Times understood: "in 45 minutes", "tonight at 8", "next friday". Recurrence: "every monday at 10am", "weekdays at 8am", "every first monday of the month at 9am".',
-].join('\n');
+function buildHelpEmbed() {
+  return new EmbedBuilder()
+    .setTitle('Remind Help')
+    .setColor('#5865F2')
+    .setDescription('Set reminders for a channel or by DM. Natural language works for the time and the repeat schedule.')
+    .addFields(
+      {
+        name: 'Create',
+        value: '`/remind channel create` remind a channel, pings you by default\n`/remind dm create` remind yourself or someone else by DM',
+      },
+      {
+        name: 'Manage',
+        value: '`/remind edit <id>` change the message or time\n`/remind delete <id>` cancel a reminder\n`/remind pause <id>` / `/remind resume <id>` pause or resume a recurring reminder',
+      },
+      {
+        name: 'View',
+        value: '`/remind list` or `/reminders` see your active reminders',
+      },
+      {
+        name: 'Timezone',
+        value: '`/remind timezone set` set your timezone\n`/remind timezone show` check what is set',
+      },
+      {
+        name: 'Examples',
+        value: 'Time: in 45 minutes, tonight at 8, next friday\nRepeat: every 2 hours, daily at 9am, every monday at 10am',
+      },
+    );
+}
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -65,14 +83,15 @@ module.exports = {
       .addStringOption((opt) => opt.setName('id').setDescription('Reminder ID').setRequired(true).setAutocomplete(true)))
     .addSubcommand((sub) => sub.setName('resume').setDescription('Resume a paused recurring reminder')
       .addStringOption((opt) => opt.setName('id').setDescription('Reminder ID').setRequired(true).setAutocomplete(true)))
-    .addSubcommand((sub) => sub.setName('list').setDescription('Show your active reminders')),
+    .addSubcommand((sub) => sub.setName('list').setDescription('Show your active reminders'))
+    .addSubcommand((sub) => sub.setName('help').setDescription('Show what /remind can do')),
 
   async execute(interaction) {
     const group = interaction.options.getSubcommandGroup(false);
     const sub = interaction.options.getSubcommand(false);
 
-    if (!sub) {
-      return interaction.reply({ content: SHORT_GUIDE, flags: MessageFlags.Ephemeral });
+    if (!sub || sub === 'help') {
+      return interaction.reply({ embeds: [buildHelpEmbed()], flags: MessageFlags.Ephemeral });
     }
 
     try {
@@ -138,7 +157,7 @@ module.exports = {
 function addCreateOptions(sub, { channel }) {
   sub.addStringOption((opt) => opt.setName('message').setDescription('The reminder message (omit for a long-message modal)').setMaxLength(1900));
   sub.addStringOption((opt) => opt.setName('when').setDescription('When, e.g. "in 45 minutes", "next friday", "tonight at 8" (required unless repeat is set)'));
-  sub.addStringOption((opt) => opt.setName('repeat').setDescription('Recurrence, e.g. "every monday at 10am", "weekdays at 8am"'));
+  sub.addStringOption((opt) => opt.setName('repeat').setDescription('Recurrence, e.g. "every 2 hours", "daily at 9am", "every monday at 10am"'));
   sub.addIntegerOption((opt) => opt.setName('repeat-count').setDescription('End after N occurrences (with repeat only)').setMinValue(1));
   sub.addStringOption((opt) => opt.setName('repeat-until').setDescription('End by this date (with repeat only), e.g. "dec 1"'));
   if (channel) {
@@ -350,13 +369,17 @@ async function buildSchedule(opts, timezone) {
   };
 }
 
+// For calendar-frequency rules (daily/weekly/monthly/yearly),
 // rule.options.until is a "field-space" Date (its UTC getters hold the
 // intended local wall-clock numbers, per utils/timezoneMath.js's DTSTART/
-// UNTIL convention) — must be converted to a real UTC instant before it's
-// stored/displayed as an actual point in time.
+// UNTIL convention) and must be converted to a real UTC instant before it's
+// stored/displayed as an actual point in time. Sub-daily rules
+// (hourly/minutely/secondly, see utils/parseRecurrence.js) use plain real
+// instants throughout instead — no conversion needed there.
 function extractRruleUntil(rruleText, timezone) {
   const rule = RRule.fromString(rruleText);
-  return rule.options.until ? fieldSpaceToUtc(rule.options.until, timezone) : null;
+  if (!rule.options.until) return null;
+  return rule.options.freq > RRule.DAILY ? rule.options.until : fieldSpaceToUtc(rule.options.until, timezone);
 }
 
 async function handleTimezoneSet(interaction) {

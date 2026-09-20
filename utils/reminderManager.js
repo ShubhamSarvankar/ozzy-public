@@ -73,6 +73,15 @@ function scheduleReminder(client, doc) {
   activeTimers.set(key, handle);
 }
 
+// `count` end conditions are enforced here, against the reminder's own
+// occurrencesFired counter, rather than via RRule's native COUNT — see the
+// comment above buildCalendarRule's RRule construction in
+// utils/parseRecurrence.js for why baking COUNT into the RRULE itself
+// silently under-delivers by one whenever DTSTART isn't itself delivered.
+function isCountExhausted(schedule, occurrencesFiredCount) {
+  return schedule.endCondition.kind === 'count' && occurrencesFiredCount >= schedule.endCondition.count;
+}
+
 function buildFireComponents(doc, fireNonce) {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId(`remfire:done:${doc.shortId}:${fireNonce}`).setLabel('Done').setStyle(ButtonStyle.Success),
@@ -81,9 +90,7 @@ function buildFireComponents(doc, fireNonce) {
     new ButtonBuilder().setCustomId(`remfire:delete:${doc.shortId}:${fireNonce}`).setLabel('Delete').setStyle(ButtonStyle.Danger),
   );
 
-  const isFinalOccurrence = doc.schedule.kind === 'recurring'
-    && doc.schedule.endCondition.kind === 'count'
-    && doc.schedule.occurrencesFired + 1 >= doc.schedule.endCondition.count;
+  const isFinalOccurrence = doc.schedule.kind === 'recurring' && isCountExhausted(doc.schedule, doc.schedule.occurrencesFired);
 
   if (doc.schedule.kind === 'recurring' && !isFinalOccurrence) {
     row.addComponents(
@@ -162,9 +169,11 @@ async function fireReminder(client, doc) {
     update['schedule.nextTrigger'] = null;
   } else {
     const currentTrigger = doc.schedule.nextTrigger;
+    const occurrencesFired = doc.schedule.occurrencesFired + 1;
+    update['schedule.occurrencesFired'] = occurrencesFired;
+
     const next = nextOccurrence(doc.schedule.rruleText, currentTrigger, doc.schedule.timezone);
-    update['schedule.occurrencesFired'] = doc.schedule.occurrencesFired + 1;
-    if (next) {
+    if (next && !isCountExhausted(doc.schedule, occurrencesFired)) {
       update['schedule.nextTrigger'] = next;
     } else {
       update.status = 'completed';
@@ -336,8 +345,9 @@ async function handleFireButton(interaction) {
       return;
     }
     const next = nextOccurrence(doc.schedule.rruleText, doc.schedule.nextTrigger, doc.schedule.timezone);
-    const update = { 'schedule.occurrencesFired': doc.schedule.occurrencesFired + 1 };
-    if (next) {
+    const occurrencesFired = doc.schedule.occurrencesFired + 1;
+    const update = { 'schedule.occurrencesFired': occurrencesFired };
+    if (next && !isCountExhausted(doc.schedule, occurrencesFired)) {
       update['schedule.nextTrigger'] = next;
     } else {
       update.status = 'completed';
