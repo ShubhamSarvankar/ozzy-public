@@ -143,7 +143,7 @@ function addCreateOptions(sub, { channel }) {
   sub.addStringOption((opt) => opt.setName('repeat-until').setDescription('End by this date (with repeat only), e.g. "dec 1"'));
   if (channel) {
     sub.addChannelOption((opt) => opt.setName('channel').setDescription('Channel to remind (defaults to this channel)'));
-    sub.addMentionableOption((opt) => opt.setName('mention').setDescription('User or role to ping alongside the message'));
+    sub.addMentionableOption((opt) => opt.setName('mention').setDescription('Who to ping (defaults to you; set a user or role to override)'));
   } else {
     sub.addUserOption((opt) => opt.setName('user').setDescription('Who to DM (defaults to you)'));
   }
@@ -287,6 +287,12 @@ function extractCreateOptions(interaction, isChannel) {
     const raw = interaction.options.get('mention');
     if (raw?.role) opts.mention = { type: 'role', id: raw.role.id };
     else if (raw?.user) opts.mention = { type: 'user', id: raw.user.id };
+    // Default: ping the reminder's own creator, since a channel reminder
+    // with no ping at all is easy to miss in a busy channel. Only an
+    // explicit `mention` overrides this (to someone else, or a role) —
+    // there's no current way to opt out of being pinged on your own
+    // channel reminder.
+    else opts.mention = { type: 'user', id: interaction.user.id };
   } else {
     const user = interaction.options.getUser('user') || interaction.user;
     opts.dmUserId = user.id;

@@ -15,11 +15,16 @@ const WEEKDAY_NAMES = Object.keys(WEEKDAY_CODES).join('|');
 const WEEKDAY_NAMES_GROUP = `(?:${WEEKDAY_NAMES})`;
 const POSITION_TO_SETPOS = { first: 1, second: 2, third: 3, fourth: 4, last: -1 };
 
+// "every" and "each" are interchangeable everywhere a pattern below expects
+// a leading frequency word ("each monday at 9am" reads as naturally as
+// "every monday at 9am").
+const EVERY = '(?:every|each)';
+
 const SUPPORTED_EXAMPLES = [
-  '`every day`', '`every 3 days`', '`every week`', '`every 2 weeks`',
+  '`daily`', '`every 3 days`', '`every other day`', '`weekly`', '`every 2 weeks`', '`biweekly`',
   '`weekdays`', '`every monday`', '`every monday, wednesday, friday`',
   '`every first monday of the month`', '`every last friday of the month`',
-  '`every month`', '`every year`',
+  '`monthly`', '`quarterly`', '`every 6 months`', '`yearly`',
 ].join(', ');
 
 function matchPattern(text) {
@@ -27,24 +32,35 @@ function matchPattern(text) {
 
   let m;
 
-  if ((m = t.match(/^every\s+(\d+)\s+days?\b/))) {
+  // --- Daily ---
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(\\d+)\\s+days?\\b`)))) {
     return { freq: RRule.DAILY, interval: Number(m[1]) };
   }
-  if (/^every\s+day\b/.test(t)) {
+  if (new RegExp(`^${EVERY}\\s+other\\s+day\\b`).test(t)) {
+    return { freq: RRule.DAILY, interval: 2 };
+  }
+  if (new RegExp(`^${EVERY}\\s+day\\b`).test(t) || /^daily\b/.test(t)) {
     return { freq: RRule.DAILY, interval: 1 };
   }
-  if ((m = t.match(/^every\s+(\d+)\s+weeks?\b/))) {
+
+  // --- Weekly / weekday-specific ---
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(\\d+)\\s+weeks?\\b`)))) {
     return { freq: RRule.WEEKLY, interval: Number(m[1]) };
   }
-  if (/^weekdays?\b/.test(t)) {
+  if (new RegExp(`^${EVERY}\\s+other\\s+week\\b`).test(t) || /^(biweekly|fortnightly)\b/.test(t)) {
+    return { freq: RRule.WEEKLY, interval: 2 };
+  }
+  if (/^weekdays?\b/.test(t) || new RegExp(`^${EVERY}\\s+weekdays?\\b`).test(t)) {
     return { freq: RRule.WEEKLY, interval: 1, byweekday: [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR] };
   }
-  if ((m = t.match(new RegExp(`^every\\s+(${WEEKDAY_NAMES_GROUP}(?:\\s*,?\\s*(?:and\\s+)?${WEEKDAY_NAMES_GROUP})*)\\b`)))) {
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(${WEEKDAY_NAMES_GROUP}(?:\\s*,?\\s*(?:and\\s+)?${WEEKDAY_NAMES_GROUP})*)\\b`)))) {
     const names = m[1].split(/\s*,\s*|\s+and\s+/).filter(Boolean);
     const byweekday = names.map((n) => WEEKDAY_CODES[n]);
     return { freq: RRule.WEEKLY, interval: 1, byweekday };
   }
-  if ((m = t.match(new RegExp(`^every\\s+(first|second|third|fourth|last)\\s+(${WEEKDAY_NAMES_GROUP})\\s+of\\s+the\\s+month\\b`)))) {
+
+  // --- Monthly (including "Nth weekday of the month") ---
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(first|second|third|fourth|last)\\s+(${WEEKDAY_NAMES_GROUP})\\s+of\\s+the\\s+month\\b`)))) {
     return {
       freq: RRule.MONTHLY,
       interval: 1,
@@ -52,16 +68,24 @@ function matchPattern(text) {
       bysetpos: [POSITION_TO_SETPOS[m[1]]],
     };
   }
-  if ((m = t.match(/^every\s+(\d+)\s+months?\b/))) {
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(\\d+)\\s+months?\\b`)))) {
     return { freq: RRule.MONTHLY, interval: Number(m[1]) };
   }
-  if (/^every\s+month\b/.test(t)) {
+  if (/^quarterly\b/.test(t)) {
+    return { freq: RRule.MONTHLY, interval: 3 };
+  }
+  if (new RegExp(`^${EVERY}\\s+month\\b`).test(t) || /^monthly\b/.test(t)) {
     return { freq: RRule.MONTHLY, interval: 1 };
   }
-  if (/^every\s+week\b/.test(t)) {
+  if (new RegExp(`^${EVERY}\\s+week\\b`).test(t) || /^weekly\b/.test(t)) {
     return { freq: RRule.WEEKLY, interval: 1 };
   }
-  if (/^(every\s+year|annually)\b/.test(t)) {
+
+  // --- Yearly ---
+  if ((m = t.match(new RegExp(`^${EVERY}\\s+(\\d+)\\s+years?\\b`)))) {
+    return { freq: RRule.YEARLY, interval: Number(m[1]) };
+  }
+  if (new RegExp(`^${EVERY}\\s+year\\b`).test(t) || /^(yearly|annually)\b/.test(t)) {
     return { freq: RRule.YEARLY, interval: 1 };
   }
 
