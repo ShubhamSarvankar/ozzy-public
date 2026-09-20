@@ -196,8 +196,35 @@ async function sweep(client) {
   }
 }
 
+// Self-healing startup step: the `reminders` collection predates this
+// rewrite and can still carry (a) leftover documents in the OLD schema
+// shape (no `shortId`, no `status` — harmless to every query in this file,
+// since they simply never match, but they collide with a fresh unique
+// index on `shortId` since Mongo treats "field absent" as null for
+// indexing purposes, and multiple such documents all have the same "null"
+// value) and (b) the OLD schema's `reminderId` unique index, which
+// Mongoose never drops on its own when a schema changes — it only adds
+// indexes it's missing. Left in place, new documents (which never set
+// `reminderId`) collide with each other on that stale index's null value
+// the moment a second reminder is created. Runs on every boot; both steps
+// are cheap no-ops once the collection is already clean, and doing this in
+// code means it self-heals without needing manual DB access on deploy.
+async function ensureCollectionHealthy() {
+  try {
+    const legacyResult = await Reminder.deleteMany({ shortId: { $exists: false } });
+    if (legacyResult.deletedCount) {
+      console.log(`[reminderManager] Removed ${legacyResult.deletedCount} pre-rewrite legacy reminder document(s).`);
+    }
+    await Reminder.syncIndexes();
+  } catch (error) {
+    console.error('[reminderManager] Failed to sync reminder collection indexes:', error);
+  }
+}
+
 function initialize(client) {
-  Reminder.find({ status: 'active' }).then((docs) => {
+  ensureCollectionHealthy().then(() => {
+    return Reminder.find({ status: 'active' });
+  }).then((docs) => {
     docs.forEach((doc) => scheduleReminder(client, doc));
   }).catch((error) => {
     console.error('[reminderManager] Failed to load active reminders on startup:', error);
