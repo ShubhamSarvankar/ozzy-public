@@ -26,4 +26,18 @@ module.exports = {
         // show a rough percent-complete in progress reports.
         estimatedTotalPages: 180000,
     },
+
+    // Pictionary game. See pictionary/discord/manager.js.
+    pictionary: {
+        channelId: 'YOUR_CHANNEL_ID_HERE', // games are always hosted in general chat
+        hostRoleId: 'YOUR_HOST_ROLE_ID_HERE',
+        ownerId: 'YOUR_OWNER_USER_ID_HERE', // owner-only analytics
+        registrationSeconds: 45,
+        readySeconds: 15, // time to click "Show my word & Ready" before the turn is skipped
+        turnStartBufferSeconds: 10, // fixed reading buffer after reveal, before the turn goes live
+        maxClues: 3,
+        vetoSeconds: 60,
+        autoAdvanceSeconds: 10,
+        wordCooldownDays: 7,
+    },
 };

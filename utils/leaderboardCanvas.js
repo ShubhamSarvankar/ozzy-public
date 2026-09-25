@@ -11,7 +11,7 @@
  *     avatarUrl: String,               // displayAvatarURL({ extension: 'png', size: 64 })
  *     badge: {
  *       value: Number,
- *       kind: 'sapphire' | 'level',
+ *       kind: 'sapphire' | 'level' | 'points',
  *       progress: Number (0-1)         // level badges only — XP progress into the next level.
  *                                      // Not part of the original scope.md row shape, but the
  *                                      // renderer can't draw a progress arc without it and the
@@ -24,7 +24,7 @@
  * Spec shape:
  *   {
  *     columnCount: 0-3,
- *     badgeKind: 'sapphire' | 'level',
+ *     badgeKind: 'sapphire' | 'level' | 'points',
  *     accentColor: '#rrggbb',          // optional, defaults per badgeKind
  *     numberFormat: 'full' | 'abbreviated',   // applies to column values only —
  *                                              // the badge always uses its own 4-char cap format
@@ -205,6 +205,7 @@ const MEDAL_COLORS = {
 const DEFAULT_ACCENT = {
   sapphire: '#0253F0',
   level: '#5865f2',
+  points: '#e67e22',
 };
 
 // Sapphire badge gradient — exact hex values specified by design review,
@@ -381,6 +382,25 @@ function drawSapphireBadge(ctx, x, y, width, height, value) {
   ctx.fillText(formatBadgeValue(value), x + width / 2, y + height / 2 + 1);
 }
 
+/** A fixed-diameter circle showing a plain point total, no progress arc (points have no "next tier"). */
+function drawPointsBadge(ctx, x, y, diameter, value, accentColor) {
+  const cx = x + diameter / 2;
+  const cy = y + diameter / 2;
+  const radius = diameter / 2;
+  const color = accentColor || DEFAULT_ACCENT.points;
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = PALETTE.badgeText;
+  ctx.font = `700 13px ${FONT_FAMILY.bold}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(formatBadgeValue(value), cx, cy + 1);
+}
+
 function drawLevelBadge(ctx, x, y, diameter, value, progress, accentColor) {
   const cx = x + diameter / 2;
   const cy = y + diameter / 2;
@@ -485,10 +505,11 @@ function drawColumn(ctx, x, width, y, height, label, formattedValue) {
 // already visible via the Discord message's own buttons.
 async function renderBoard({ title, subtitle, rows, spec, page = 1, totalPages = 1 }) {
   ensureFontsRegistered();
+  const resolvedBadgeKind = spec.badgeKind === 'level' || spec.badgeKind === 'points' ? spec.badgeKind : 'sapphire';
   const normSpec = {
     columnCount: Math.max(0, Math.min(3, spec.columnCount || 0)),
-    badgeKind: spec.badgeKind === 'level' ? 'level' : 'sapphire',
-    accentColor: spec.accentColor || DEFAULT_ACCENT[spec.badgeKind === 'level' ? 'level' : 'sapphire'],
+    badgeKind: resolvedBadgeKind,
+    accentColor: spec.accentColor || DEFAULT_ACCENT[resolvedBadgeKind],
     numberFormat: spec.numberFormat === 'abbreviated' ? 'abbreviated' : 'full',
   };
 
@@ -553,13 +574,15 @@ async function renderBoard({ title, subtitle, rows, spec, page = 1, totalPages =
       colX += width + GAP;
     }
 
-    // Badge — sapphire hex height varies per render (see computeLayout), level circle stays fixed.
-    const thisBadgeHeight = normSpec.badgeKind === 'level' ? BADGE_HEIGHT : layout.badgeHeight;
+    // Badge — sapphire hex height varies per render (see computeLayout), level/points circles stay fixed.
+    const thisBadgeHeight = normSpec.badgeKind === 'level' || normSpec.badgeKind === 'points' ? BADGE_HEIGHT : layout.badgeHeight;
     const badgeY = y + (rowHeight - thisBadgeHeight) / 2;
     const badgeX = layout.width - PADDING_X - layout.badgeWidth;
     const badge = row.badge || { value: 0, kind: normSpec.badgeKind };
     if (normSpec.badgeKind === 'level') {
       drawLevelBadge(ctx, badgeX, badgeY, BADGE_HEIGHT, badge.value, badge.progress, normSpec.accentColor);
+    } else if (normSpec.badgeKind === 'points') {
+      drawPointsBadge(ctx, badgeX, badgeY, BADGE_HEIGHT, badge.value, normSpec.accentColor);
     } else {
       drawSapphireBadge(ctx, badgeX, badgeY, layout.badgeWidth, thisBadgeHeight, badge.value);
     }
