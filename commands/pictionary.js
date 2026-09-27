@@ -71,15 +71,20 @@ module.exports = {
 };
 
 async function runHostAction(interaction, sub) {
+  // Deferred immediately: pauseGame/resumeGame/endGame/removeActor can post
+  // channel messages and hit Mongo, which can take longer than the 3 seconds
+  // Discord allows for a first acknowledgment - a bare reply() at the end was
+  // seen to fail live with DiscordAPIError 10062 "Unknown interaction".
+  await interaction.deferReply(ephemeral);
   const game = await manager.currentOpenGame(interaction.guildId);
-  if (!game) return interaction.reply({ content: 'There is no running game.', ...ephemeral });
+  if (!game) return interaction.editReply('There is no running game.');
   let err;
   if (sub === 'pause') err = await manager.pauseGame(game._id);
   else if (sub === 'resume') err = await manager.resumeGame(game._id);
   else if (sub === 'end') err = await manager.endGame(game._id);
   else err = await manager.removeActor(game._id, interaction.options.getUser('user').id);
   const done = { pause: 'Game paused.', resume: 'Game resumed.', end: 'Game ended.', 'remove-actor': 'Player removed from acting this round.' }[sub];
-  return interaction.reply({ content: err || done, ...ephemeral });
+  return interaction.editReply(err || done);
 }
 
 async function showUserStats(interaction) {
@@ -121,14 +126,18 @@ async function showLeaderboard(interaction) {
       name: user ? user.username : r.userId,
       avatarUrl: user ? user.displayAvatarURL({ extension: 'png', size: 64 }) : null,
       badge: { value: r.points, kind: 'points' },
-      columns: [{ label: 'Wins', value: r.wins }, { label: 'Games', value: r.games }],
+      columns: [
+        { label: 'Wins', value: r.wins },
+        { label: 'Games', value: r.games },
+        { label: 'Speed', value: r.fastestSolveMs || 0, formatted: formatSolve(r.fastestSolveMs) },
+      ],
     };
   }));
   const png = await renderBoard({
     title: 'Pictionary leaderboard',
     subtitle: 'All time',
     rows: boardRows,
-    spec: { columnCount: 2, badgeKind: 'points', numberFormat: 'full' },
+    spec: { columnCount: 3, badgeKind: 'points', numberFormat: 'full' },
   });
   return interaction.editReply({ files: [new AttachmentBuilder(png, { name: 'pictionary-leaderboard.png' })] });
 }

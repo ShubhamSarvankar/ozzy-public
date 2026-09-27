@@ -11,7 +11,7 @@ function rulesText({
 } = {}) {
   return [
     `When it's your turn, press **Show my word & Ready** within **${readySeconds} seconds**. Only you see the word. You then get **${turnStartBufferSeconds} seconds** to read it before the turn actually starts.`,
-    `Describe it in the game channel using at most **${maxClues} messages**. Editing a message counts as another message.`,
+    `You get up to **${maxClues} separate messages** in the game channel to describe it. Editing a sent message counts as a clue being used.`,
     '',
     '**Hard rules (breaking one ends your turn, no points):**',
     '• Do not say the word, its plural, or any banned word',

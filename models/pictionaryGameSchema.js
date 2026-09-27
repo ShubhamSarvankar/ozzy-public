@@ -44,6 +44,9 @@ const pictionaryGameSchema = new mongoose.Schema({
   // The category of the most recently picked word, tracked across the whole Game (not
   // reset between Rounds), so pickTurnWord can avoid repeating it on the next turn.
   lastTurnCategory: { type: String, default: null },
+  // Reset to 0 at the start of each Round. Counts how many times registration has
+  // already been extended this Round for not meeting minActors (config.pictionary).
+  registrationRetries: { type: Number, default: 0 },
 
   registrationMessageId: { type: String, default: null },
   readyMessageId: { type: String, default: null },

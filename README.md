@@ -24,6 +24,8 @@ A crash-safe Discord bot serving 10k+ users (leveling, economy, utilities, games
 
 **One renderer, every leaderboard.** `utils/leaderboardCanvas.js` takes normalized rows and a layout spec and has no idea what a "sapphire" or a "level" is — every board is the same function with a different spec. Badge widths are measured once per page so differing number lengths don't shift alignment row to row.
 
+**A whole Pictionary game survives a restart.** `pictionary/engine/` (word selection, near-miss detection, scoring, veto tallying) is pure and unit-tested with zero Discord or Mongo imports; `pictionary/discord/manager.js` is the only place that talks to either, and every phase writes its one live deadline to Mongo before anything else, so `setTimeout` is just an optimization for hitting it early, never the source of truth. A crash mid-turn, mid-mute, or mid-veto-vote rebuilds cleanly on boot, with a periodic sweep catching anything a missed timer didn't.
+
 ## Stack
 
 | | |

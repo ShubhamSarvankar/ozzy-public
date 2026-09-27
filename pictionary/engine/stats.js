@@ -147,13 +147,15 @@ function podiumFinishes(turns, userId) {
 }
 
 /**
- * All time leaderboard rows: points, wins (rank 1 with points, ties count) and games.
- * Only games in `finishedGameIds` count. Sorted by points then wins.
+ * All time leaderboard rows: points, wins (rank 1 with points, ties count), games,
+ * and fastestSolveMs (their quickest correct guess, null if they have none). Only
+ * games in `finishedGameIds` count. Sorted by points then wins - fastestSolveMs is
+ * informational only and never affects that order.
  */
 function allTimeTotals(turns, finishedGameIds) {
   const totals = new Map();
   const get = (id) => {
-    if (!totals.has(id)) totals.set(id, { userId: id, points: 0, wins: 0, games: 0 });
+    if (!totals.has(id)) totals.set(id, { userId: id, points: 0, wins: 0, games: 0, fastestSolveMs: null });
     return totals.get(id);
   };
   for (const g of standingsByGame(turns)) {
@@ -164,6 +166,15 @@ function allTimeTotals(turns, finishedGameIds) {
       row.games += 1;
       if (r.rank === 1 && r.points > 0) row.wins += 1;
     }
+  }
+  // Separate pass: standingsByGame's rows are per-game point totals, not individual
+  // turns, so a guess's own solveMs isn't available there. Same "valid guess"
+  // definition as userStats(): guessed, not annulled, a finite solve time recorded.
+  for (const t of turns) {
+    if (!finishedGameIds.has(String(t.gameId))) continue;
+    if (t.status !== 'guessed' || t.annulled || !t.guesserId || !Number.isFinite(t.solveMs)) continue;
+    const row = get(t.guesserId);
+    if (row.fastestSolveMs === null || t.solveMs < row.fastestSolveMs) row.fastestSolveMs = t.solveMs;
   }
   return [...totals.values()].sort((a, b) => b.points - a.points || b.wins - a.wins);
 }

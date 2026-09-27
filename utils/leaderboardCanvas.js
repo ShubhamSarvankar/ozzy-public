@@ -18,7 +18,12 @@
  *                                      // renderer must stay ignorant of XP/level math, so callers
  *                                      // compute the fraction and pass it through here.
  *     },
- *     columns: [{ label: String, value: Number }]   // 0-3 entries, per spec.columnCount
+ *     columns: [{ label: String, value: Number, formatted: String }]   // 0-3 entries, per
+ *                                      // spec.columnCount. `formatted`, e.g. "12.3s", is
+ *                                      // optional and drawn as-is instead of running `value`
+ *                                      // through formatColumnNumber - for a column whose unit
+ *                                      // isn't a plain/abbreviated integer (Pictionary's "Speed").
+ *                                      // Every other caller leaves it unset and is unaffected.
  *   }
  *
  * Spec shape:
@@ -257,7 +262,7 @@ function computeLayout(rows, spec) {
     for (const row of rows) {
       const col = row.columns && row.columns[c];
       if (!col) continue;
-      const text = formatColumnNumber(col.value, spec.numberFormat);
+      const text = col.formatted ?? formatColumnNumber(col.value, spec.numberFormat);
       widest = Math.max(widest, mctx.measureText(text).width);
     }
     mctx.font = `600 10px ${FONT_FAMILY.medium}`;
@@ -569,7 +574,7 @@ async function renderBoard({ title, subtitle, rows, spec, page = 1, totalPages =
       const col = row.columns && row.columns[c];
       const width = layout.columnWidths[c];
       if (col) {
-        drawColumn(ctx, colX, width, y, rowHeight, col.label, formatColumnNumber(col.value, normSpec.numberFormat));
+        drawColumn(ctx, colX, width, y, rowHeight, col.label, col.formatted ?? formatColumnNumber(col.value, normSpec.numberFormat));
       }
       colX += width + GAP;
     }

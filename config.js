@@ -39,5 +39,8 @@ module.exports = {
         vetoSeconds: 60,
         autoAdvanceSeconds: 10,
         wordCooldownDays: 7,
+        minActors: 3, // fewer than this when registration closes extends it instead of starting the round
+        registrationExtensionSeconds: 30,
+        maxRegistrationExtensions: 3, // after this many extensions still short, the game ends instead
     },
 };

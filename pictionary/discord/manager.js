@@ -17,7 +17,7 @@ const {
   rulesText, wordRevealText, resultText, standingsLines, formatSolve, clueMirrorText, nearMissText,
 } = require('../engine/format');
 const {
-  isLiveStatus, msFromNow, remainingMs, resumeDeadline, isLastTurn, wordFromTurn,
+  isLiveStatus, msFromNow, remainingMs, resumeDeadline, isLastTurn, wordFromTurn, registrationOutcome,
 } = require('../engine/state');
 
 // Single owner of Pictionary game state. Every transition writes Mongo first and rebuilds
@@ -223,7 +223,7 @@ async function openRegistration(gameId, round) {
     $set: {
       status: 'registering', currentRound: round, currentTurnIndex: 0, deadlineAt: deadline,
       registrants: [], roundOrder: [], roundRegistrants: [], registrationMessageId: null, currentTurnId: null,
-      roundCommunityWordUsed: false,
+      roundCommunityWordUsed: false, registrationRetries: 0,
     },
   });
   const channel = await getChannel(game.channelId);
@@ -300,16 +300,53 @@ async function handleReactionRemove(reaction, user) {
   await Game.updateOne({ _id: gameId, status: 'registering' }, { $pull: { registrants: user.id } });
 }
 
-async function closeRegistration(gameId) {
+/** `force: true` (the Host's "Start now" button) always starts the round immediately,
+ * whatever the headcount - that button is an explicit override, not subject to
+ * minActors. A natural timeout (force: false, the default) checks minActors first:
+ * short-handed extends registration up to maxRegistrationExtensions times, then gives
+ * up (ends the Game) rather than start an understaffed Round. */
+async function closeRegistration(gameId, { force = false } = {}) {
   const game = await Game.findById(gameId);
   if (!game || !game.open || game.status !== 'registering') return;
-  clearPhaseTimer(gameId);
-  if (game.registrationMessageId) registrationMsgs.delete(game.registrationMessageId);
-  await editMessage(game.channelId, game.registrationMessageId, { components: [] });
 
   const removed = new Set(game.afkRemoved.filter((r) => r.round === game.currentRound).map((r) => r.userId));
   const eligible = game.registrants.filter((id) => !removed.has(id));
   const channel = await getChannel(game.channelId);
+
+  if (!force) {
+    const outcome = registrationOutcome(eligible.length, cfg().minActors, game.registrationRetries, cfg().maxRegistrationExtensions);
+    if (outcome === 'extend') {
+      // Registration itself is untouched (message, reactions, registrants all stay live) -
+      // only the deadline moves and the retry count goes up.
+      clearPhaseTimer(gameId);
+      const deadline = new Date(msFromNow(Date.now(), cfg().registrationExtensionSeconds));
+      const remaining = cfg().maxRegistrationExtensions - game.registrationRetries - 1;
+      await Game.updateOne({ _id: gameId }, { $set: { deadlineAt: deadline }, $inc: { registrationRetries: 1 } });
+      if (channel) {
+        await say(channel, { embeds: [embed().setDescription(
+          `Only ${eligible.length} of the ${cfg().minActors} minimum actors have registered for round ${game.currentRound}. `
+          + `Extending registration by ${cfg().registrationExtensionSeconds} seconds (${remaining} extension${remaining === 1 ? '' : 's'} left).`,
+        )] });
+      }
+      const fresh = await Game.findById(gameId);
+      setPhaseTimer(fresh);
+      return;
+    }
+    if (outcome === 'give-up') {
+      console.error(`[pictionary] closeRegistration: game ${gameId} still only has ${eligible.length}/${cfg().minActors} actors after ${cfg().maxRegistrationExtensions} extensions, ending the game`);
+      if (channel) {
+        await say(channel, { embeds: [embed().setDescription(
+          `Still fewer than ${cfg().minActors} actors registered after ${cfg().maxRegistrationExtensions} extensions.`,
+        )] });
+      }
+      return finishGame(gameId);
+    }
+  }
+
+  clearPhaseTimer(gameId);
+  if (game.registrationMessageId) registrationMsgs.delete(game.registrationMessageId);
+  await editMessage(game.channelId, game.registrationMessageId, { components: [] });
+
   if (!eligible.length) {
     if (channel) await say(channel, { embeds: [embed().setDescription(`Nobody registered for round ${game.currentRound}.`)] });
     await Game.updateOne({ _id: gameId }, { $set: { status: 'between', deadlineAt: null, roundOrder: [], roundRegistrants: [] } });
@@ -483,33 +520,39 @@ function claimTurn(gameId) {
 
 /** The Actor presses "Show my word & Ready": ephemeral reveal, starts the fixed reading buffer. */
 async function handleShowWordAndReady(interaction) {
+  // Deferred immediately, before withLock: this is the highest-frequency Pictionary
+  // interaction (once per turn) and every branch below is already ephemeral, so
+  // deferring ephemeral up front and editing it in is always correct. Without this,
+  // queueing behind another in-flight turn transition on the same game can outrun
+  // the 3 second ack window (DiscordAPIError 10062 "Unknown interaction").
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const turnId = interaction.customId.split(':')[2];
   const turnDoc = await Turn.findById(turnId).select('gameId').lean();
-  if (!turnDoc) return interaction.reply({ content: 'That turn no longer exists.', flags: MessageFlags.Ephemeral });
+  if (!turnDoc) return interaction.editReply({ content: 'That turn no longer exists.' });
   return withLock(turnDoc.gameId, async () => {
     const game = await Game.findById(turnDoc.gameId);
     const turn = await Turn.findById(turnId);
-    if (!game || !turn) return interaction.reply({ content: 'That turn no longer exists.', flags: MessageFlags.Ephemeral });
-    if (interaction.user.id !== turn.actorId) return interaction.reply({ content: 'Only the Actor can press this.', flags: MessageFlags.Ephemeral });
-    if (game.status === 'paused') return interaction.reply({ content: 'The game is paused.', flags: MessageFlags.Ephemeral });
+    if (!game || !turn) return interaction.editReply({ content: 'That turn no longer exists.' });
+    if (interaction.user.id !== turn.actorId) return interaction.editReply({ content: 'Only the Actor can press this.' });
+    if (game.status === 'paused') return interaction.editReply({ content: 'The game is paused.' });
     if (game.status !== 'ready_check' || oid(game.currentTurnId) !== turnId || turn.status !== 'pending') {
-      return interaction.reply({ content: 'This turn is no longer waiting for Ready.', flags: MessageFlags.Ephemeral });
+      return interaction.editReply({ content: 'This turn is no longer waiting for Ready.' });
     }
     const word = getWord(turn.wordId) || wordFromTurn(turn);
     if (!word) {
       console.error(`[pictionary] handleShowWordAndReady: word "${turn.wordId}" for turn ${turnId} (game ${turnDoc.gameId}) is missing from words.json and has no snapshot - was words.json edited mid-game?`);
-      return interaction.reply({ content: 'That word is no longer in the word list. Ask the Host to skip.', flags: MessageFlags.Ephemeral });
+      return interaction.editReply({ content: 'That word is no longer in the word list. Ask the Host to skip.' });
     }
 
     const now = new Date();
     const claimed = await Turn.updateOne({ _id: turnId, status: 'pending' }, { $set: { status: 'active', revealedAt: now } });
-    if (!claimed.modifiedCount) return interaction.reply({ content: 'This turn is no longer waiting for Ready.', flags: MessageFlags.Ephemeral });
+    if (!claimed.modifiedCount) return interaction.editReply({ content: 'This turn is no longer waiting for Ready.' });
 
     const deadline = new Date(msFromNow(now.getTime(), cfg().turnStartBufferSeconds));
     const fresh = await Game.findByIdAndUpdate(game._id, { $set: { status: 'starting', deadlineAt: deadline } }, { new: true });
     setPhaseTimer(fresh);
 
-    await interaction.reply({ content: wordRevealText(word, { turnStartBufferSeconds: cfg().turnStartBufferSeconds }), flags: MessageFlags.Ephemeral });
+    await interaction.editReply({ content: wordRevealText(word, { turnStartBufferSeconds: cfg().turnStartBufferSeconds }) });
     await editMessage(game.channelId, game.readyMessageId, {
       content: '',
       embeds: [embed().setTitle('Reading their word...').setDescription(`<@${turn.actorId}> is reading their word. The turn starts <t:${Math.floor(deadline.getTime() / 1000)}:R>.`)],
@@ -779,17 +822,21 @@ async function handleControl(interaction) {
   }
   if (action !== 'pause' && action !== 'end') {
     console.warn(`[pictionary] handleControl: unrecognized action "${action}" on game ${gameId} (stale button from an old version?)`);
+    return interaction.reply({ content: 'Unknown control.', flags: MessageFlags.Ephemeral });
   }
-  const message = action === 'pause' ? await pauseGame(gameId) : action === 'end' ? await endGame(gameId) : 'Unknown control.';
-  if (message) return interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
-  return interaction.deferUpdate().catch(() => {});
+  // Deferred immediately: pauseGame/endGame post their own channel messages and hit
+  // Mongo, which can outrun Discord's 3 second ack window (seen live as DiscordAPIError
+  // 10062 "Unknown interaction" when the fallback reply() below ran too late).
+  await interaction.deferUpdate();
+  const message = action === 'pause' ? await pauseGame(gameId) : await endGame(gameId);
+  if (message) return interaction.followUp({ content: message, flags: MessageFlags.Ephemeral });
 }
 
 async function handleStartNow(interaction) {
   if (!isHost(interaction)) return interaction.reply({ content: 'Only the Host can start the round early.', flags: MessageFlags.Ephemeral });
   await interaction.deferUpdate();
   const gameId = interaction.customId.split(':')[2];
-  return withLock(gameId, () => closeRegistration(gameId));
+  return withLock(gameId, () => closeRegistration(gameId, { force: true }));
 }
 
 async function currentOpenGame(guildId) {
@@ -848,10 +895,13 @@ async function resumeGame(gameId) {
 
 async function handleResume(interaction) {
   if (!isHost(interaction)) return interaction.reply({ content: 'Only the Host can resume the game.', flags: MessageFlags.Ephemeral });
+  // Deferred immediately: resumeGame posts a channel message and can rebuild the
+  // active turn's state, either of which can outrun the 3 second ack window.
+  await interaction.deferUpdate();
   const gameId = interaction.customId.split(':')[2];
   const err = await resumeGame(gameId);
-  if (err) return interaction.reply({ content: err, flags: MessageFlags.Ephemeral });
-  return interaction.update({ components: [] });
+  if (err) return interaction.followUp({ content: err, flags: MessageFlags.Ephemeral });
+  return interaction.editReply({ components: [] });
 }
 
 /** Current round only. Returns an error string, or null on success. */
@@ -982,15 +1032,20 @@ async function handleVote(interaction) {
   const [, , turnId, choice] = interaction.customId.split(':');
   const turnDoc = await Turn.findById(turnId).select('gameId').lean();
   if (!turnDoc) return interaction.reply({ content: 'This vote no longer exists.', flags: MessageFlags.Ephemeral });
+  // Deferred immediately, before withLock: this can queue behind another in-flight
+  // turn transition on the same game long enough to outrun the 3 second ack window.
+  await interaction.deferUpdate();
   return withLock(turnDoc.gameId, async () => {
     const turn = await Turn.findById(turnId);
-    if (!turn || !turn.veto.startedAt || turn.veto.result) return interaction.update({ content: 'This vote is closed.', embeds: [], components: [] });
+    if (!turn || !turn.veto.startedAt || turn.veto.result) return interaction.editReply({ content: 'This vote is closed.', embeds: [], components: [] });
     const uid = interaction.user.id;
-    if (!turn.veto.eligible.includes(uid)) return interaction.reply({ content: 'You cannot vote on this turn.', flags: MessageFlags.Ephemeral });
-    if (turn.veto.yes.includes(uid) || turn.veto.no.includes(uid)) return interaction.reply({ content: 'You already voted.', flags: MessageFlags.Ephemeral });
+    // followUp, not editReply, for both rejections below: the vote message itself
+    // is still live for whoever it was actually meant for and must not be overwritten.
+    if (!turn.veto.eligible.includes(uid)) return interaction.followUp({ content: 'You cannot vote on this turn.', flags: MessageFlags.Ephemeral });
+    if (turn.veto.yes.includes(uid) || turn.veto.no.includes(uid)) return interaction.followUp({ content: 'You already voted.', flags: MessageFlags.Ephemeral });
     const field = choice === 'y' ? 'veto.yes' : 'veto.no';
     const updated = await Turn.findByIdAndUpdate(turnId, { $addToSet: { [field]: uid } }, { new: true });
-    await interaction.update({ embeds: [embed().setDescription(`Vote recorded: **${choice === 'y' ? 'Yes, veto' : 'No, keep it'}**.`)], components: [] });
+    await interaction.editReply({ embeds: [embed().setDescription(`Vote recorded: **${choice === 'y' ? 'Yes, veto' : 'No, keep it'}**.`)], components: [] });
     const t = tally(updated.veto.yes, updated.veto.no, updated.veto.eligible);
     if (t.result || t.allVoted) await resolveVeto(turnDoc.gameId, turnId);
   });

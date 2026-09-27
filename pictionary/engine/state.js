@@ -36,6 +36,15 @@ function wordFromTurn(turn) {
   return { id: turn.wordId, ...turn.wordVersion };
 }
 
+/** What to do when registration closes with fewer than minActors registered:
+ * 'proceed' (enough actors), 'extend' (short, but retries left), or 'give-up'
+ * (short, and out of retries - the caller should end the Game instead of
+ * starting an understaffed Round). */
+function registrationOutcome(eligibleCount, minActors, retries, maxExtensions) {
+  if (eligibleCount >= minActors) return 'proceed';
+  return retries < maxExtensions ? 'extend' : 'give-up';
+}
+
 module.exports = {
-  isLiveStatus, msFromNow, remainingMs, resumeDeadline, isLastTurn, wordFromTurn, LIVE_STATUSES,
+  isLiveStatus, msFromNow, remainingMs, resumeDeadline, isLastTurn, wordFromTurn, registrationOutcome, LIVE_STATUSES,
 };
