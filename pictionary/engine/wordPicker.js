@@ -25,9 +25,17 @@ function exposureTimes(turns) {
  * @param opts.now ms timestamp
  * @param opts.cooldownDays default 7
  * @param opts.excludeIds ids never to pick (e.g. already used in this game)
- * @param opts.category optional category filter
+ * @param opts.category optional category filter. Hard: no match in this category
+ *   means no word at all (used by nothing today, kept for a future category mode).
  * @param opts.preferSource optional source ('community') to prefer when available; falls back
  *   to the full pool (still honoring cooldown/exclude/category) when nothing matches.
+ *   Applied before excludeCategory, so it wins when the two conflict: a Round guaranteed
+ *   its one community word matters more than that word's category not repeating.
+ * @param opts.excludeCategory optional category to avoid, e.g. the previous turn's,
+ *   so consecutive turns don't repeat a category. Soft: only applied when doing so
+ *   leaves at least one candidate, so a small or lopsided word list (or a `category`
+ *   filter that only matches one category, or a `preferSource` match that's only in
+ *   this category) never goes empty just to satisfy this.
  * @param opts.rng () => [0,1)
  * Falls back to the least recently exposed word when every candidate is on cooldown.
  */
@@ -39,16 +47,21 @@ function pickWord(words, opts = {}) {
     excludeIds = [],
     category = null,
     preferSource = null,
+    excludeCategory = null,
     rng = Math.random,
   } = opts;
   const excluded = new Set(excludeIds);
-  const base = words.filter((w) => !excluded.has(w.id) && (!category || w.category === category));
-  let pool = base;
+  let pool = words.filter((w) => !excluded.has(w.id) && (!category || w.category === category));
+  if (!pool.length) return null;
+
   if (preferSource) {
-    const preferred = base.filter((w) => w.source === preferSource);
+    const preferred = pool.filter((w) => w.source === preferSource);
     if (preferred.length) pool = preferred;
   }
-  if (!pool.length) return null;
+  if (excludeCategory) {
+    const withoutCategory = pool.filter((w) => w.category !== excludeCategory);
+    if (withoutCategory.length) pool = withoutCategory;
+  }
 
   const cutoff = now - cooldownDays * DAY_MS;
   const fresh = pool.filter((w) => !(exposure.get(w.id) > cutoff));
@@ -58,16 +71,6 @@ function pickWord(words, opts = {}) {
   return pool[0];
 }
 
-/**
- * Picks the category for a Round's Nth turn so consecutive Rounds don't repeat
- * the same category back to back. Deterministic given `seed` (e.g. the round
- * number) so it's testable without an rng.
- */
-function rotateCategory(categories, seed) {
-  if (!categories.length) return null;
-  return categories[((seed % categories.length) + categories.length) % categories.length];
-}
-
 module.exports = {
-  isExposed, exposureTimes, pickWord, rotateCategory, DAY_MS,
+  isExposed, exposureTimes, pickWord, DAY_MS,
 };

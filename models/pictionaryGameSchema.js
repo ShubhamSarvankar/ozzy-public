@@ -41,6 +41,9 @@ const pictionaryGameSchema = new mongoose.Schema({
   // Reset false at the start of each Round; flipped true once a `source: 'community'`
   // word has been picked for a turn this Round, guaranteeing at least one per Round.
   roundCommunityWordUsed: { type: Boolean, default: false },
+  // The category of the most recently picked word, tracked across the whole Game (not
+  // reset between Rounds), so pickTurnWord can avoid repeating it on the next turn.
+  lastTurnCategory: { type: String, default: null },
 
   registrationMessageId: { type: String, default: null },
   readyMessageId: { type: String, default: null },

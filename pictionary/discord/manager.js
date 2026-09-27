@@ -10,7 +10,7 @@ const { isCorrectGuess } = require('../engine/guess');
 const { checkClue } = require('../engine/clueRules');
 const { checkNearMiss } = require('../engine/nearMiss');
 const { pointsForTurn, standings, podium } = require('../engine/scoring');
-const { pickWord, exposureTimes, rotateCategory, DAY_MS } = require('../engine/wordPicker');
+const { pickWord, exposureTimes, DAY_MS } = require('../engine/wordPicker');
 const { tally, finalResult } = require('../engine/veto');
 const { aggregate } = require('../engine/stats');
 const {
@@ -70,7 +70,10 @@ function isHost(interaction) {
 }
 
 async function getChannel(id) {
-  try { return await client.channels.fetch(id); } catch { return null; }
+  try { return await client.channels.fetch(id); } catch (err) {
+    console.error(`[pictionary] getChannel(${id}) failed, a game in this channel cannot proceed normally:`, err.message);
+    return null;
+  }
 }
 
 async function say(channel, payload) {
@@ -84,9 +87,14 @@ async function editMessage(channelId, messageId, payload) {
   if (!messageId) return;
   try {
     const ch = await getChannel(channelId);
-    const msg = await ch?.messages.fetch(messageId);
-    await msg?.edit(payload);
-  } catch { /* message gone, nothing to do */ }
+    if (!ch) return; // getChannel already logged why
+    const msg = await ch.messages.fetch(messageId);
+    await msg.edit(payload);
+  } catch (err) {
+    // Usually benign (message deleted, or edited after it stopped being relevant), but
+    // also the only way a permissions problem editing embeds/components would surface.
+    console.warn(`[pictionary] editMessage failed (channel ${channelId}, message ${messageId}):`, err.message);
+  }
 }
 
 function setPhaseTimer(game) {
@@ -113,6 +121,7 @@ async function onPhaseDeadline(gameId) {
     else if (game.status === 'starting') await withLock(gameId, () => startTurnLive(gameId));
     else if (game.status === 'active') await endTurn(gameId, { status: 'timeout' });
     else if (game.status === 'between') await withLock(gameId, () => advance(gameId));
+    else console.warn(`[pictionary] onPhaseDeadline: game ${gameId} has deadlineAt but an unhandled status "${game.status}", nothing done`);
   } catch (err) {
     console.error('[pictionary] phase deadline failed:', err);
   }
@@ -163,7 +172,10 @@ async function clearMute(game) {
 async function startGame(interaction, { rounds, seconds, nearMissHints }) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const channel = await getChannel(cfg().channelId);
-  if (!channel?.isTextBased()) return interaction.editReply('I could not find the game channel.');
+  if (!channel?.isTextBased()) {
+    console.error(`[pictionary] startGame: configured channelId ${cfg().channelId} is not a usable text channel (getChannel returned ${channel ? 'a non-text channel' : 'nothing'}) - check config.js`);
+    return interaction.editReply('I could not find the game channel.');
+  }
 
   const me = channel.guild.members.me;
   const perms = channel.permissionsFor(me);
@@ -172,8 +184,14 @@ async function startGame(interaction, { rounds, seconds, nearMissHints }) {
     ['EmbedLinks', PermissionFlagsBits.EmbedLinks], ['AddReactions', PermissionFlagsBits.AddReactions],
     ['ReadMessageHistory', PermissionFlagsBits.ReadMessageHistory],
   ].filter(([, flag]) => !perms.has(flag)).map(([n]) => n);
-  if (need.length) return interaction.editReply(`I am missing permissions in <#${channel.id}>: ${need.join(', ')}.`);
-  if (!loadWords().length) return interaction.editReply('The word list is empty, so there is nothing to play.');
+  if (need.length) {
+    console.error(`[pictionary] startGame: missing permissions in channel ${channel.id}: ${need.join(', ')}`);
+    return interaction.editReply(`I am missing permissions in <#${channel.id}>: ${need.join(', ')}.`);
+  }
+  if (!loadWords().length) {
+    console.error('[pictionary] startGame: words.json has no usable words (validateWords may be rejecting all of them - check startup logs)');
+    return interaction.editReply('The word list is empty, so there is nothing to play.');
+  }
 
   let game;
   try {
@@ -185,12 +203,14 @@ async function startGame(interaction, { rounds, seconds, nearMissHints }) {
     });
   } catch (err) {
     if (err?.code === 11000) return interaction.editReply('A Pictionary game is already running.');
+    console.error('[pictionary] startGame: failed to create the Game document:', err);
     throw err;
   }
 
   const warn = perms.has(PermissionFlagsBits.ManageRoles)
     ? ''
     : '\nWarning: I lack Manage Permissions in the channel, so I cannot mute Actors after their last clue. Extra messages will be deleted if I can.';
+  if (warn) console.warn(`[pictionary] startGame: game ${game.shortId} started without Manage Permissions in channel ${channel.id}, mutes will fail all game`);
   await interaction.editReply(`Game ${game.shortId} created in <#${channel.id}>: ${rounds} round${rounds > 1 ? 's' : ''}, ${seconds}s turns, near-miss hints ${game.nearMissHints ? 'on' : 'off'}.${warn}`);
   await withLock(game._id, () => openRegistration(game._id, 1));
 }
@@ -207,7 +227,10 @@ async function openRegistration(gameId, round) {
     },
   });
   const channel = await getChannel(game.channelId);
-  if (!channel) return cancelGame(game, 'The game channel is gone.');
+  if (!channel) {
+    console.error(`[pictionary] openRegistration: channel gone for game ${gameId}, cancelling`);
+    return cancelGame(game, 'The game channel is gone.');
+  }
 
   const e = embed()
     .setTitle(`Pictionary, Round ${round} of ${game.totalRounds}`)
@@ -226,8 +249,13 @@ async function openRegistration(gameId, round) {
     new ButtonBuilder().setCustomId(`pict:start:${gameId}`).setLabel('Start now (Host)').setStyle(ButtonStyle.Primary),
   );
   const msg = await say(channel, { embeds: [e], components: [row] });
-  if (!msg) return cancelGame(game, 'I could not post in the game channel.');
-  await msg.react(REG_EMOJI).catch(() => {});
+  if (!msg) {
+    console.error(`[pictionary] openRegistration: could not post the registration message for game ${gameId}, cancelling`);
+    return cancelGame(game, 'I could not post in the game channel.');
+  }
+  await msg.react(REG_EMOJI).catch((err) => console.error(
+    `[pictionary] openRegistration: could not react to the registration message for game ${gameId} - sign-ups may be broken this round (missing Add Reactions?):`, err.message,
+  ));
   registrationMsgs.set(msg.id, String(gameId));
   const fresh = await Game.findByIdAndUpdate(gameId, { $set: { registrationMessageId: msg.id } }, { new: true });
   setPhaseTimer(fresh);
@@ -239,7 +267,9 @@ async function handleReactionAdd(reaction, user) {
   const game = await Game.findById(gameId);
   if (!game || game.status !== 'registering') return;
   if (game.afkRemoved.some((r) => r.round === game.currentRound && r.userId === user.id)) {
-    await reaction.users.remove(user.id).catch(() => {});
+    await reaction.users.remove(user.id).catch((err) => console.warn(
+      `[pictionary] handleReactionAdd: could not remove ${user.id}'s reaction after AFK removal on game ${gameId} (cosmetic only, they still cannot register):`, err.message,
+    ));
     return;
   }
   const res = await Game.updateOne(
@@ -250,10 +280,15 @@ async function handleReactionAdd(reaction, user) {
   try {
     await user.send({ embeds: [embed().setTitle('Pictionary actor rules').setDescription(rulesText({ maxClues: cfg().maxClues, readySeconds: cfg().readySeconds, turnStartBufferSeconds: cfg().turnStartBufferSeconds }))] });
   } catch {
+    // DMs closed is common and expected; only the total failure (no DM and no fallback
+    // notice) actually leaves the registrant with zero indication anything went wrong.
     const ch = await getChannel(game.channelId);
     if (ch) {
       const note = await say(ch, { content: `<@${user.id}> I could not DM you. Open your DMs for this server so you can receive rules reminders.`, allowedMentions: { users: [user.id] } });
-      setTimeout(() => note?.delete().catch(() => {}), 15000);
+      if (!note) console.error(`[pictionary] handleReactionAdd: DM to ${user.id} failed and the in-channel fallback notice also failed to send on game ${gameId}`);
+      setTimeout(() => note?.delete().catch((err) => console.warn('[pictionary] handleReactionAdd: could not delete the "could not DM you" notice:', err.message)), 15000);
+    } else {
+      console.error(`[pictionary] handleReactionAdd: DM to ${user.id} failed and the game channel is also gone on game ${gameId}, they will have no idea they need to open DMs`);
     }
   }
 }
@@ -316,39 +351,56 @@ async function advance(gameId) {
   return openRegistration(gameId, game.currentRound + 1);
 }
 
-/** `idx` is the turn's position within the current round's roundOrder, passed explicitly
- * by the caller rather than read back off game.currentTurnIndex, so the category-rotation
- * seed can't silently desync from the actual turn position if a future caller updates
- * roundOrder/currentTurnIndex differently. */
-async function pickTurnWord(game, idx) {
+/** Picks the word for a Game's next turn. Consecutive turns never repeat a category
+ * (game.lastTurnCategory, tracked across the whole Game, not just within a Round, and
+ * relaxed automatically by pickWord if honoring it would leave no candidate) unless
+ * a `source: 'community'` word hasn't been picked yet this Round, in which case that
+ * guarantee wins: a community word is preferred regardless of category, since a Round
+ * always getting one of the community's own words matters more than the category not
+ * repeating on that one turn. */
+async function pickTurnWord(game) {
   const cooldownDays = cfg().wordCooldownDays;
   const history = await Turn.find({ startedAt: { $gte: new Date(Date.now() - cooldownDays * DAY_MS) } })
     .select('wordId startedAt endedAt').lean();
   const exposure = exposureTimes(history);
   const words = loadWords();
-  const categories = [...new Set(words.map((w) => w.category))];
 
   const wantCommunity = !game.roundCommunityWordUsed;
-  const category = wantCommunity ? null : rotateCategory(categories, game.currentRound * 97 + idx);
-  let word = pickWord(words, {
-    exposure, cooldownDays, excludeIds: game.usedWordIds, preferSource: wantCommunity ? 'community' : null, category,
+  return pickWord(words, {
+    exposure,
+    cooldownDays,
+    excludeIds: game.usedWordIds,
+    excludeCategory: game.lastTurnCategory || null,
+    preferSource: wantCommunity ? 'community' : null,
   });
-  if (!word) word = pickWord(words, { exposure, cooldownDays, excludeIds: game.usedWordIds });
-  return word;
 }
 
 async function startTurnPrompt(game, actorId, idx) {
   const channel = await getChannel(game.channelId);
-  if (!channel) { await cancelGame(game, 'The game channel is gone.'); return 'abort'; }
+  if (!channel) {
+    console.error(`[pictionary] startTurnPrompt: channel gone for game ${game._id}, aborting`);
+    await cancelGame(game, 'The game channel is gone.');
+    return 'abort';
+  }
 
-  const word = await pickTurnWord(game, idx);
-  if (!word) { await cancelGame(game, 'The word list is empty.'); return 'abort'; }
+  const word = await pickTurnWord(game);
+  if (!word) {
+    console.error(`[pictionary] startTurnPrompt: pickWord returned nothing for game ${game._id} (usedWordIds may cover the whole list, or words.json is empty), aborting`);
+    await cancelGame(game, 'The word list is empty.');
+    return 'abort';
+  }
 
   const turn = await Turn.create({
     gameId: game._id, round: game.currentRound, turnIndex: idx, actorId, wordId: word.id, tier: word.tier,
     wordVersion: snapshotWord(word),
   });
-  await Game.updateOne({ _id: game._id }, { $addToSet: { usedWordIds: word.id }, $set: { currentTurnIndex: idx } });
+  // lastTurnCategory is written for this pick regardless of whether the turn actually
+  // starts (the Actor might not press Ready) - the point is spreading picks across
+  // categories, and a skipped turn still consumed one.
+  await Game.updateOne({ _id: game._id }, {
+    $addToSet: { usedWordIds: word.id },
+    $set: { currentTurnIndex: idx, lastTurnCategory: word.category },
+  });
 
   const deadline = new Date(msFromNow(Date.now(), cfg().readySeconds));
   const row = new ActionRowBuilder().addComponents(
@@ -361,6 +413,7 @@ async function startTurnPrompt(game, actorId, idx) {
     components: [row],
   });
   if (!msg) {
+    console.error(`[pictionary] startTurnPrompt: could not post the "your turn" prompt for actor ${actorId} on game ${game._id}, skipping their turn`);
     await Turn.updateOne({ _id: turn._id }, { $set: { status: 'not_started', notStartedReason: 'recovery', endedAt: new Date() } });
     return 'skipped';
   }
@@ -443,7 +496,10 @@ async function handleShowWordAndReady(interaction) {
       return interaction.reply({ content: 'This turn is no longer waiting for Ready.', flags: MessageFlags.Ephemeral });
     }
     const word = getWord(turn.wordId) || wordFromTurn(turn);
-    if (!word) return interaction.reply({ content: 'That word is no longer in the word list. Ask the Host to skip.', flags: MessageFlags.Ephemeral });
+    if (!word) {
+      console.error(`[pictionary] handleShowWordAndReady: word "${turn.wordId}" for turn ${turnId} (game ${turnDoc.gameId}) is missing from words.json and has no snapshot - was words.json edited mid-game?`);
+      return interaction.reply({ content: 'That word is no longer in the word list. Ask the Host to skip.', flags: MessageFlags.Ephemeral });
+    }
 
     const now = new Date();
     const claimed = await Turn.updateOne({ _id: turnId, status: 'pending' }, { $set: { status: 'active', revealedAt: now } });
@@ -469,6 +525,7 @@ async function startTurnLive(gameId) {
   const turn = await Turn.findById(game.currentTurnId);
   const word = turn && (getWord(turn.wordId) || wordFromTurn(turn));
   if (!turn || !word) {
+    console.error(`[pictionary] startTurnLive: ${!turn ? `turn ${game.currentTurnId} not found` : `word "${turn.wordId}" missing`} for game ${gameId}, terminating this turn`);
     if (turn) await Turn.updateOne({ _id: turn._id }, { $set: { status: 'terminated', annulled: true, annulReason: 'host', endedAt: new Date() } });
     await Game.updateOne({ _id: gameId }, { $set: { status: 'between', currentTurnIndex: (turn?.turnIndex ?? game.currentTurnIndex) + 1, currentTurnId: null, deadlineAt: new Date() } });
     return onPhaseDeadline(String(gameId));
@@ -480,6 +537,7 @@ async function startTurnLive(gameId) {
   turn.startedAt = now;
 
   const channel = await getChannel(game.channelId);
+  if (!channel) console.error(`[pictionary] startTurnLive: channel gone for game ${gameId} - the turn will run with no visible "Turn started" message or clue mirror`);
   const msg = channel ? await say(channel, {
     embeds: [embed().setTitle('Turn started').setDescription([
       `<@${turn.actorId}> is describing a word. You have **${cfg().maxClues} messages**.`,
@@ -509,18 +567,33 @@ function persistClues(st) {
 
 function refreshClueEmbed(st) {
   if (!st.clueEmbedMessageId) return;
-  editMessage(st.channelId, st.clueEmbedMessageId, { embeds: [embed().setTitle('Clues so far').setDescription(clueMirrorText(st.clueSnapshots))] }).catch(() => {});
+  // editMessage already logs its own failures; nothing extra needed here beyond not
+  // letting a rejection escape (it never should - editMessage catches internally - but
+  // this stays defensive since it's fired-and-forgotten from message handlers).
+  editMessage(st.channelId, st.clueEmbedMessageId, { embeds: [embed().setTitle('Clues so far').setDescription(clueMirrorText(st.clueSnapshots))] })
+    .catch((err) => console.error(`[pictionary] refreshClueEmbed: unexpected rejection for turn ${st.turnId}:`, err));
 }
 
 async function announceMute(st, message) {
   const notice = 'You used all your clue messages. You are muted in the channel until this turn ends.';
+  let dmOk = false;
   try {
     const user = await client.users.fetch(st.actorId);
-    await user.send(notice).catch(() => {});
-  } catch { /* DM closed */ }
+    await user.send(notice);
+    dmOk = true;
+  } catch { /* DM closed, the in-channel reply below is the actor's other chance to see this */ }
+  let replyOk = false;
   if (message) {
-    const reply = await message.reply({ content: `<@${st.actorId}> ${notice}`, allowedMentions: { repliedUser: false, users: [] } }).catch(() => null);
-    setTimeout(() => reply?.delete().catch(() => {}), 10000);
+    const reply = await message.reply({ content: `<@${st.actorId}> ${notice}`, allowedMentions: { repliedUser: false, users: [] } }).catch((err) => {
+      console.warn(`[pictionary] announceMute: in-channel notice failed for actor ${st.actorId} on turn ${st.turnId}:`, err.message);
+      return null;
+    });
+    replyOk = Boolean(reply);
+    setTimeout(() => reply?.delete().catch((err) => console.warn('[pictionary] announceMute: could not delete the mute notice:', err.message)), 10000);
+  }
+  if (!dmOk && !replyOk) {
+    const why = message ? 'DM closed and the in-channel notice failed too' : 'DM closed, and this mute came from an edited clue so there is no message to reply to';
+    console.error(`[pictionary] announceMute: actor ${st.actorId} on turn ${st.turnId} was muted with no way to tell them why (${why})`);
   }
 }
 
@@ -704,6 +777,9 @@ async function handleControl(interaction) {
       await advance(gameId);
     });
   }
+  if (action !== 'pause' && action !== 'end') {
+    console.warn(`[pictionary] handleControl: unrecognized action "${action}" on game ${gameId} (stale button from an old version?)`);
+  }
   const message = action === 'pause' ? await pauseGame(gameId) : action === 'end' ? await endGame(gameId) : 'Unknown control.';
   if (message) return interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
   return interaction.deferUpdate().catch(() => {});
@@ -871,7 +947,13 @@ async function startVeto(interaction, gameId) {
         dms.push({ userId, channelId: sent.channelId, messageId: sent.id });
       } catch { /* DMs closed: this person cannot vote */ }
     }
-    if (!dms.length) return interaction.editReply('I could not DM any voters, so the vote was not started.');
+    if (!dms.length) {
+      console.error(`[pictionary] startVeto: none of ${candidates.length} candidate voter(s) could be DMed for turn ${turn._id} (game ${gameId}) - the vote did not start`);
+      return interaction.editReply('I could not DM any voters, so the vote was not started.');
+    }
+    if (dms.length < candidates.length) {
+      console.warn(`[pictionary] startVeto: only ${dms.length}/${candidates.length} candidate voters could be DMed for turn ${turn._id} (game ${gameId})`);
+    }
 
     const deadline = new Date(msFromNow(Date.now(), cfg().vetoSeconds));
     await Turn.updateOne({ _id: turn._id }, { $set: { 'veto.startedAt': new Date(), 'veto.deadlineAt': deadline, 'veto.eligible': dms.map((d) => d.userId), 'veto.dms': dms } });
@@ -1024,8 +1106,14 @@ async function finishGame(gameId) {
 async function rebuildActive(game) {
   const turn = await Turn.findById(game.currentTurnId);
   const word = turn && (getWord(turn.wordId) || wordFromTurn(turn));
-  if (!turn || turn.status !== 'active' || !turn.startedAt) return null;
+  if (!turn || turn.status !== 'active' || !turn.startedAt) {
+    if (game.status === 'active') {
+      console.warn(`[pictionary] rebuildActive: game ${game._id} is 'active' but its current turn is missing or not actually active/started - Game and Turn state have desynced`);
+    }
+    return null;
+  }
   if (!word) {
+    console.error(`[pictionary] rebuildActive: word "${turn.wordId}" for turn ${turn._id} (game ${game._id}) is missing from words.json and has no snapshot, terminating the turn on recovery`);
     await Turn.updateOne({ _id: turn._id }, { $set: { status: 'terminated', annulled: true, annulReason: 'host', endedAt: new Date() } });
     return null;
   }
@@ -1061,10 +1149,16 @@ async function sweep() {
     const games = await Game.find({ open: true });
     for (const game of games) {
       const id = String(game._id);
-      if (isLiveStatus(game.status) && game.deadlineAt
-        && new Date(game.deadlineAt).getTime() < Date.now() - 3000 && !phaseTimers.has(id)) {
-        if (game.status === 'active' && !activeTurns.has(id)) await recoverGame(game);
-        else await onPhaseDeadline(id);
+      // Isolated per game, same as initialize()'s recovery loop: one game failing to
+      // heal here must not stop the sweep from checking every other open game.
+      try {
+        if (isLiveStatus(game.status) && game.deadlineAt
+          && new Date(game.deadlineAt).getTime() < Date.now() - 3000 && !phaseTimers.has(id)) {
+          if (game.status === 'active' && !activeTurns.has(id)) await recoverGame(game);
+          else await onPhaseDeadline(id);
+        }
+      } catch (err) {
+        console.error(`[pictionary] sweep: recovery failed for game ${id} (status ${game.status}):`, err);
       }
     }
     const stuck = await Game.find({ open: false, mutedUserId: { $ne: null } });
