@@ -603,4 +603,7 @@ module.exports = {
   formatBadgeValue,
   formatColumnNumber,
   FONT_FAMILY,
+  // Reused by hungergames/discord/winnerCard.js.
+  loadAvatarImage,
+  ensureFontsRegistered,
 };

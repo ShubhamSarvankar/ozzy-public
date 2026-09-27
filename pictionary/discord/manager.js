@@ -65,8 +65,8 @@ const shuffle = (arr) => {
 function isHost(interaction) {
   const roles = interaction.member?.roles;
   if (!roles) return false;
-  if (roles.cache) return roles.cache.has(cfg().hostRoleId);
-  return Array.isArray(roles) && roles.includes(cfg().hostRoleId);
+  if (roles.cache) return cfg().hostRoleIds.some((id) => roles.cache.has(id));
+  return Array.isArray(roles) && cfg().hostRoleIds.some((id) => roles.includes(id));
 }
 
 async function getChannel(id) {

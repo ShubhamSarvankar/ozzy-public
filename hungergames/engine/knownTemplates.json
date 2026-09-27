@@ -1,0 +1,2192 @@
+[
+  {
+    "template": "{P1}",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} abandons {P2} after they fell in a ditch.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} ABSOLUTELY SMASHES their blueguitar on {P2} head, Kurt Cobain style.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} accidentally casts a stinging hex on themselves.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} accidentally collected poisoned water to drink.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} accidentally drops the banhammer on their toe. The universe itself recoils in pain.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} accidentally steps on the slipper, which was facing upwards. Ouch.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} accidentally writes their own name in the Death Note but misspells it. They get a massive headache.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} ate fortune coconuts. Health has increased.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} attacks {P2} with the Excalibur. But it's not the Excookiebur, so it hurts the player instead.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} attacks {P2} with the legendary sword Excookiebur. {P2} fucking dies.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} attempts a powerful overhead smash on a log, but loses their grip and drops the heavy mace on their foot.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} attempts a powerful spell, but it backfires, hitting them with full force.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} attempts an attack on {P2} with their banhammer.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} attempts to throw their knife at a tree but it ricochets off and hits their leg.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} beats up a recruiter and steals their curry!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} becomes the life of the party at the feast, playing songs on their blue guitar. They are rewarded with extra rations.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} bites into a cookie and finds it's rock-hard, chipping a tooth.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} blasts {P2} with a mega snowball!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} blows the whistle—a wild puffle attacks {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} bonks {P2} on the head with the metronome, over and over, in perfect time.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} bonks {P2} with a golden nugget! *Cha-ching!*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} bonks {P2} with the cardboard tube! *thwack*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} bonks {P2} with the shovel. Sand flies everywhere!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} breaks a string while playing, and it whips them in the eye.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} brings the Master Ball to the feast. No one knows what it is, and it's not useful for eating.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} brings their mace down hard on {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} broke into Elp's office to steal cookies. Instead, he found some classified documents.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} brought their own cookies to the feast! They are a huge hit and they eat their fill, greatly increasing their health.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} buries their axe in {P2}'s chest!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} burns themselves while trying to start a fire.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} came upon an axe, but are not sure how to use it.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} cannot find anyone to cuddle with and sleeps alone.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Charizard!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Gengar!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Mew!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Mewtwo!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Snorlax!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} captures a wild Torchic!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} carefully selects a good sleeping spot to rest.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} chances upon a sturdy mace.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} channels all their energy into one final, gigantic fireball that completely engulfs {P2}.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} Charizard attacks {P2} with Flamethrower.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} chills with Beasto.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} chills with Diwix.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} chills with Jo.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} chills with Scorp.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} climbs a tree and starts throwing coconuts at {P2}.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} comes back from the mines alive",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} commandeered a snow cannon! ❄️💣",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} considers the chances of escaping the game if they complain hard enough.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} contemplates life.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} contemplates the state of equality among Helpers, and how Elp is slightly more equal than the others.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} convinces everyone that {P2} is the impostor. {P2} was not The Impostor.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} cooks a meal using stolen food from the staff kitchen, taking a huge risk...",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} cooks a meal using stolen food from the staff kitchen.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} cracks {P2} with a pickaxe!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} crafts a sturdy longbow and a quiver of arrows.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} cries while thinking about home.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} crushes {P2} with the anchor! *\"Heavy!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} crushes {P2}'s defenses with a devastating blow from the mace!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} cuddles with {P2} near a campfire.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} deactivates their lightsaber too close to their face, singeing their eyebrows.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} deletes {P2} with a single AWP shot to the chest.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} delivers a final, brutal swing with the axe to {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} discovered Desireus' coconuts!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} discovers a box of suspiciously good cookies!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} discovers the curry is way too spicy and spends the next hour crying in a bush.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} does a very pathetic looking dance. An old, worn-out rubber rat falls on the ground afterwards.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} doesn't even hesitate. They throw the Master Ball at {P2}, capturing them instantly.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} dosen't give a shit about their surroundings and sleeps",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} dosen't give a shit about their surroundings and sleeps.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} dragged up a tiny anchor! ⚓",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} dreams of a Shinigami and wakes up screaming, taking emotional damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} dreams of winning the Legends Cup.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} dreams they are in a battle and swings their mace in their sleep, hitting the ground and sending painful shockwaves up their arm.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} dreams they are in a heated online argument and wakes up with a throbbing headache from the stress.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} drops the block on {P2}! *CRUNCH*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} dug up a waterlogged cannonball! 💦",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} eats a cookie too fast and chokes, taking minor damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} eats puffle pizza.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} eats the curry too fast and gets severe heartburn.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} eats too many cookies before bed and gets a terrible stomach ache.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} encounters Javascript in the wild. This could go either ways...",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} enjoys a bowl of delicious curry, feeling energized. 🍛",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} ensures everyone at the feast has good manners. They are rewarded with extra dessert for their diligence.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} equips, aims, and fires slipper at {P2}. La Chancla wins.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} explores the surroundings.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} falls asleep while practicing and the guitar falls on their face.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} figured out how to control the lighthouse beam! 🔆",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} figures out how to use an axe by practicing on {P2}.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds a backpack but its booby trapped.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds a backpack full of medicines and first-aid.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds a black notebook with \"DEATH NOTE\" written on the cover.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a bow and some arrows.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds a heavy, spiked mace. Brutal.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a laptop with NodeJS installed. The power of Javascript is at their fingertips.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a large boulder and smashes it to rubble with their mace, impressed by their own strength ⚒️",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a moment of peace and enjoys a delicious cookie 🍪",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a mysterious keyboard that lets them generate giant word bubbles.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a mysterious purple and white sphere with the letter 'M' on it. It's a Master Ball!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a mysterious, powerful-looking wand. Could it be the Elder Wand?",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a pot of suspiciously spicy curry.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a pristine AWP Dragon Lore. It's beautiful.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a red crewmate that looks a little... sus.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a rusty, old pistol. It might still work.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a sharp, menacing axe stuck in a tree stump.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a sleek, elegant hilt. With a press of a button, a fabulous pink plasma blade ignites!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a small, wooden metronome. Tick. Tock.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a strange, glowing rock. It assembles itself into a Sneaky Golem and pledges its loyalty!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a strangely alluring blue guitar.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds a well-balanced combat knife.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds an abandoned cow.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds an ancient tome and learns the secrets of casting a fireball.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds an opening and viciously attacks {P2} with their knife!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finds Excalibur but no one really cares cuz it's not Excookiebur.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds mom's slippers.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} finds the ultimate weapon of discipline: a slipper.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} finishes all their tasks and is rewarded with extra food for being a good crewmate.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} fires a crab at {P2}! *Pinch!*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} fires some blunt arrows on {P2}.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} flings a berry at {P2}. They look queasy!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} flips their hair, and swings a pink lightsaber at {P2} while twerking. _Slayyyyy_.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} flips their hair, and swings a pink lightsaber at {P2} while twerking. It is not very effective, but the twerking gets them some pity.",
+    "label": "attack:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} floods {P2}'s vision with so many big word bubbles that they can't see the real attack coming.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} focuses the intense lighthouse beam on {P2}, searing them!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} force-feeds {P2} a very dry cookie.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} forces {P2} to eat a ghost pepper curry. {P2} spontaneously combusts.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} found a bowl of spicy yet soothing curry. It insantly makes them feel better.",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a crab-powered cannon! 🦀🔫",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a disco ball bomb! 💃",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a heavy espresso tamper behind the counter!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a pistol!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} found a rusty pickaxe! ⛏️",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a small kitchen knife.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} found a small kitchen knife. The blade is smaller than their finger.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} found a snowball.",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a stale pizza box! 🍕",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a sturdy cardboard tube! 📦",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a surprisingly sharp pizza cutter! 🍕",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a suspicious soccer ball... 💣",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a suspiciously ticking calzone... 💣",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a toxic puffle berry! 🍇",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found a wild berry and healed themselves!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found nothing!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found the legendary Puffle Whistle! 📯",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found the PSA's golden gavel! ⚖️",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} found the Yeti's stolen sled! 🛷",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} fumbles an arrow, which falls and stabs them in the foot.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} fumbles the Master Ball, which pops open and releases a jolt of capture energy, hurting them.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} gains Herculean strength after eating curry and squeezes {P2}'s skull like a ripe tomato.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} Gengar attacks {P2} with Shadow Ball.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} gets a TypeError and their brain short-circuits, causing minor psychic damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} gets flashbacks of their mom and takes emotional damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} gets into a fistfight with {P2}.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} gets promoted in Help Force. The ego boost heals a part of them.",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} gets some rest.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} gives {P2} cookies laced with posion.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} gives ketchup cookies to {P2}.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} gives ketchup cookies to {P2}. They die.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} grabbed a bamboo staff! 🎋",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} grabbed a heavy signal lantern! 💡",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} grabbed a hockey stick! 🏒",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} grabbed a hot coffee mug! ☕",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} grabbed a rolled-up newspaper! 📰",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} harvests broccoli.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} harvests some corn.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} has a nightmare about being chased by a giant naan bread and gets indigestion from the stress.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare about being chased by the impostor and runs into a wall.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare about getting a bad grade and instinctively hits themselves with the slipper.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare about getting rushed and accidentally fires the AWP. The loud bang gives them tinnitus.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare about Voldemort and the wand unleashes a burst of uncontrolled magic, zapping them.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare and rolls over onto their axe.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has a nightmare and unconsciously casts a fireball, setting their sleeping bag on fire.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} has been chosen by the mighty Banhammer!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} hides from the mini mods.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} hit {P2} with a snowball!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} hits {P2} with the slipper! The disrespect is more painful than the blow.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} hooks {P2} for {N} damage!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} hurls a massive fireball at {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} ignores everything else to grab a hot pink lightsaber even though its faulty.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} is sleeping in turns with {P2}",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} is so slow while scoped in that a snake manages to bite their leg.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} is startled by a noise and fumbles their pistol, shooting themselves in the foot.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} is startled when their Sneaky Golem appears out of nowhere, causing them to trip and fall.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} is whittling a piece of wood when the knife slips, giving them a nasty cut.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} jabs {P2} with the pole! *\"No skiing for you!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} judges {P2} to be unworthy and drops the Banhammer!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} kicks the ball at {P2}—it explodes! 💥",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} lands a one-shot elimination on {P2} with the Golden Gun!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} lands a perfect shot on {P2} from a distance!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} lands an impossible flick shot on {P2}, ending the round.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} launches a cannonball at {P2}! Sploosh!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} learns {P2}'s name and writes it in the Death Note. {P2} suffers a heart attack.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} lets an arrow fly towards {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} lunges at {P2} with their dazzling pink lightsaber!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} lures {P2} into a trap—BOOM!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} Mew attacks {P2} but it's not very effective.",
+    "label": "attack:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} Mew attacks {P2} with kindness. Oh No!",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} Mewtwo attacks everyone in the area with Psystrike.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} overwhelms {P2} with a flurry of swift, elegant strikes from the pink lightsaber!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} performs a face-melting guitar solo before delivering a final, epic smash on {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} pets some cats.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} pets some dogs.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} picked up a sandy shovel! 🏝️",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} plays a sad, beautiful song on their blue guitar. Their spirits are lifted 🎸",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} points the Elder Wand at {P2} and shouts \"Avada Kedavra\"!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} pokemon helps them heal and protects them from damage.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} polishes the banhammer. It whispers forbidden rules. 🔨",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} practices some simple charms, making flowers bloom around them. 🪄",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} practices typing \"L\" and \"ratio\" very quickly. 💬",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} pried loose a frozen ice block! 🧊",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} promises to sleep with {P2} for mutual protection, but then ghosts them.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} pulls out a phone that they hid in their butt, to watch a video of {P2} that they recorded secretly.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} purchases a banana peel launcher from Amazon. TONY STARK COULD'VE MADE THAT IN A CAVE.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} puts on the slipper and feels an overwhelming urge to tell someone to clean their room. 🩴",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} received medicines from an unknown Sponsor",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} receives a message from {P2}, and goes to sleep looking confident.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} remembers the times when they would steal Snowy's office doors and blame some staff member for it.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} reveals they were the impostor all along and eliminates {P2}.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} rolls over in their sleep onto the lightsaber's activation switch. A very rude awakening.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} rolls the pizza cutter over {P2}! \"One slice or two?\"",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} runs over {P2} with the sled! *\"WHEEE—CRASH!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} scares off {P2} by munching curry and getting an instant strength boost.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} scouts for people to fight, but gets distracted by an unsupervised cookie.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} sees their own reflection and calls an emergency meeting on themself. They are voted out.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} sets the metronome on the table to regulate the pace of eating. They are not invited to parties often, but they digest well.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} shares their delicious curry with everyone. It's a massive hit and they are rewarded with the largest portion.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} shoots banana peels at {P2}, causing them to slip.",
+    "label": "attack:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} shoots bananas at {P2}, who slips and falls on their head.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} shows {P2} their code. The spaghetti logic is so horrifying it causes physical damage.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} silently moves in and stabs {P2} with a knife.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} sings Bhaag Bhaag DK Bose perfectly and is blessed with a bowl of curry!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} sings in the quietness of night, fills the surrounding with temporary peace",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} sits at the head of the table. No one dares to take food before them. They eat their fill.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} slams the gavel—{P2} is sentenced to damage!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} slaps {P2} with the stick! *Clack!*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} slashes {P2} with the cutlass! (\"Yarr!\")",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} sleeps on the Master Ball. The button presses down, and they wake up feeling drained, as if part of their soul was captured.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} slept peacefully through the night...",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} slips into an alternate dimension. When they return, they have a pink mohawk and a banana peel launcher.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} smacks {P2} with the box. *\"Ew, anchovies!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} smashes {P2} with the espresso tamper! That's gotta hurt.",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} smashes their blue guitar over {P2}'s head! Rock and roll!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} snapped a ski pole in half! 🎿",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} snatched a fishing rod from Herbert's stash! 🎣",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} sneaks into Elp's lounge during the Overtime?? Day chaos and steals the ban hammer!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} spams the host with so many compliments that they get given extra food out of sheer annoyance.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day chopping firewood, preparing for the cold night 🪵",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day debugging. The bug was a typo. It's always a typo 💻",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day drinking coconut water and hydrating themselves. We love a hydrated queen 💅",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day holding an angle on a long corridor. Nothing happens. 🔫",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day polishing their Master Ball, confident in its power. 🟣",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day practicing their aim on CPO staff members 🔫",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day practicing their lightsaber forms, looking incredibly stylish. ✨",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day trying to figure out the rules of the Death Note. It's complicated. 📓",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} spends the day venting around the arena, looking for shortcuts. 📮",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} squeezes the rubber rat, emitting a ridiculous squeak. {P2} laughs, but the Rat of Doom suddenly appears...",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} stalks the Commanders, noting their every move for future reference.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} starts playing Tistles Tuba in front of {P2} and hypnotizes them.",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} starts praying for luck, after finding a Roulette Gun.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} stays up all night trying to understand Promises. They take exhaustion damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} steals Krabby when Herbert isn't looking. They cook it and enjoy the meal peacefully.",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} stole Cap'n Smol's prized cutlass! ⚔️",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} strikes {P2} with the staff! *\"Hi-yah!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} struck gold! 💛",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} struggles with their trauma all alone",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} successfully hunts a small rabbit with their bow, securing a meal 🏹",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} sucker punches {P2}",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} swings the Banhammer. {P2} is permanently removed from the game.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} swings the lantern at {P2}! *Clang!*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} swings the rubber rat at {P2}, emitting a menacing squeaking sound.",
+    "label": "attack:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} swings their axe wildly at a tree and accidentally hits their own leg.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} swings their mace at {P2} hitting their butt. Ouch.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} takes aim and fires their pistol at {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} takes turns sleeping with {P2}, but {P2}'s constant sleep-farting makes them run away.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tells Beasto to creepily simp on {P2}. They insantly die of cringe. RIP",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} tests the weight of their mace, but the swing is too wide and they hit their own knee.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} threw their axe up in the air and it fell right on them.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} throws a coconut at {P2} with incredible force!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} throws a masterball at {P2}. Player was caught!",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} throws a metronome at {P2}.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} throws a pot of scalding hot curry at {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} throws hot coffee at {P2}! It's super effective!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} throws javascript code at {P2} instantly killing them with brain decomposition.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} throws the bomb—{P2} gets blasted by glitter! ✨",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} throws the Master Ball at {P2}! It's a guaranteed catch! {P2} has been captured.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} ties {P2} to a chair, but promises to let them go if the first round is a blank.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} ties {P2} to a chair, but promises to let them go if the first round is a blank. The first round goes off with a resounding bang, leaving blood everywhere.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} took a risk and broke into Elp's office and stole a few cookies.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tosses and turns in their sleep and gets cut by their own knife.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tosses the calzone at {P2}—it explodes in a cheesy mess! 💥",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} touched a weird-looking box and found a reality glitch! 🌀",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} traps {P2} in an infinite loop. Their existence is nullified.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tried picking coconuts but fell off the tree.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tried to cut a coconut tree but it fell on them.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries a cool spinning trick with their lightsaber but loses their grip, and it singes their leg.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries climbing a tree to set up camp but falls and gets hurt.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries some beans that burn their tongue.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to calculate the nutritional value of the feast but gets 'NaN'. They eat a single berry.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to center a div, fails, and punches their monitor in frustration.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to clean their pistol, but it accidentally discharges, grazing their leg.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to conjure a fireball but only manages to badly singe their fingers.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to distract {P2} with cookies, fails miserably, and loses the cookies.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to do a task but fakes it so badly they electrocute themselves.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to find a way to sneak into Elp's bedroom... 😳",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to grab a weapon but ends up taking damage instead.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to play a complicated solo, gets frustrated, and smashes the guitar on their own head.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to quickscope a bird but misses, revealing their position to a pack of angry bears.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to secure a weapon but ends up taking damage instead.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to shoot {P2} with their pistol.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} tries to spam the chat but gets rate-limited by the arena, causing their brain to overload.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to test the banhammer's weight, but it's too heavy and they strain their back.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to use the metronome as a weapon, but just bonks themself on the head.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to use their pistol to open a can of beans. It goes as planned.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries to write \"a delicious meal\" in the Death Note, but nothing happens.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} tries using an axe on {P2} but doesn't quite get it right.",
+    "label": "attack:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} trips over their bow in the dark, causing an arrow to spring from the quiver and poke them.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} unearths an old, worm-out rubber rat.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} unfortunately doesn't survive the javascript exposure.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} unleashes a flurry of slipper strikes on {P2}! It's super effective!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} unleashes an unending wall of text, burying {P2} under an avalanche of giant word bubbles.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} unleashes the power of the Elder Wand, casting an unstoppable curse 'Crucio' at {P2}.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} unleashes the scroll's power—{P2} is engulfed in flames! 🔥",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} unloads a point-blank shot into {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} unrolled a map... it's a trap! 🗺️💥",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} unrolled the forbidden Dragon Scroll! 🐉📜",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} uses a small fireball to light a campfire, feeling like a true wizard. 🔥",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses cookies to distract {P2} and runs away. Fucking coward.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} uses Elps banhammer to obliterate {P2}. {N}HP is reduced!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} uses the AWP to intimidate other tributes, ensuring they get the first pick of the food.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses the Elder Wand to conjure a magnificent feast out of thin air, healing them greatly.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses the glitch on {P2}, causing them to briefly phase out of existence!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} uses the Jetpack to perform a death-from-above slam on {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} uses the metronome to time their attacks perfectly, leaving no openings for {P2}.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses the Ring Controller to call down a localized storm on {P2}!",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} uses the steady rhythm of the metronome to meditate, feeling centered 🧘",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their archery skills to shoot an apple off another tribute's head, earning them extra food for their bravery.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their axe to expertly carve the roast beast, earning a small but satisfying portion.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their fireball to perfectly roast a wild pig for the feast, earning the gratitude of all.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their knife to carve a sharp point on a stick, creating a makeshift spear 🔪",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their knife to skillfully carve the best cuts of meat from the feast, healing them significantly.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their lightsaber to instantly toast bread for the whole group. Their flair earns them extra portions.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} uses their mace to tenderize the meat. Everyone is too scared to say it's overdone, and they get a stomach ache.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} was sleeping and coconuts fell on them!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} whacks {P2} with the newspaper! *\"Extra! Extra!\"*",
+    "label": "attack:1:2",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "{P1} wonders if the Master Ball can catch humans, points it at their own head, and presses the button. They are now trapped inside.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} write's {P2} name in the Death Note.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} writes {P2}'s name in the Death Note. It's over.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1} writes an event post for the HF website, because even when your life is in danger, staff work must be done.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1} writes their own name in the Death Note as a joke, not believing it's real. They suffer a heart attack.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1}, in a moment of pity, offers {P2} a cookie. It's a final meal.",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1}, there are not enough players to start the game.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1}'s hand slips in their sleep and they gently tap their own head with the banhammer, instantly giving them a migraine.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1}'s pokemon gives them a stat boost. They tickle {P2} to death.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "{P1}'s Sneaky Golem appears from the shadows and ambushes {P2} with a powerful punch!",
+    "label": "attack:1:2",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1}'s Sneaky Golem follows them silently through the forest, a loyal, rocky companion. 🗿",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "{P1}'s Sneaky Golem stumbles in the dark, accidentally kicking a large rock onto {P1}.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "**{P1}**",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "**{P1}** is the sole survivor with their trusty **{X}**!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "• {P1} - {N}",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "• {P1} - {N}% HP",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "• {P1} {X}",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "• {P1}: {N} HP {N}",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "☠️ {P1}",
+    "label": "died:1",
+    "source": "death list"
+  },
+  {
+    "template": "⚰️ {P1}",
+    "label": "died:1",
+    "source": "death list"
+  },
+  {
+    "template": "✝️ {P1}",
+    "label": "died:1",
+    "source": "death list"
+  },
+  {
+    "template": "✨ {P1} and Ru sing along to cringe Indian DJ songs.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "✨ {P1} buys invests in GeoCoin. Geo sneaks into their home at night and leaves them some gifts.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} buys some teeth from Nell to snack on, giving them energy.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} calls Ayan a curry muncher and receives Ayan Hats as a reward.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} calls Beasto a monkey.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} calls Wynn a curry muncher. Wynn is overjoyed and bakes them a cake.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} does a headstand and says Tasty. Jo is happy that he finally found someone he can relate to.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} exposed the underground staff food black market. Elp rewards {P1}!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "✨ {P1} exposed the underground staff food black market. Elp rewards {P1}.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} has an at-length conversation with Zenishira about games and personality types.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} helps Joe in getting some stuff done.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} listens to rock music for morale. Scorp notices and brews a coffee for them.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ {P1} spams Diwix's DMs with memes.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ Diwix rewards {P1} for agreeing that Bose DK is the best army.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ Maya bought {P1} a gourmet lollipop!",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ Ru and {P1} sing along to Bollywood songs.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ Ru and {P1} sing along to cringe Indian DJ songs.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "✨ Snowy lets {P1} pet Petunia.",
+    "label": null,
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🥊 {P1} and {P2} stared at each other menacingly, but had no weapons!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "🪦 {P1} claims that Summer Bash is not a real trophy. Ayan impales them with his pencil.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} dies of cringe during a conversation with Beasto.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} gets accidentally eaten by Jo. Was it really an accident? We'll never know.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} gets forced to pull Santa Geo's sleigh, which proves fatal.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} gets sued and hires Snowy as their lawyer. She causes legal damages and {P1} now owes **Elp** their soul.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} makes Nell's bruschetta recipe but adds curry to it. Nell uses a dental drill to slowly burrow into their brain.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} publicly states that rock music is the worst genre. Scorp smashes a fucking grand piano on their head.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} says that Diwix isn't a real curry muncher.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} says that Joe is very American. Joe responds as a true patriot by invading their home and taking all their oil.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} says they would make a better Twin Oreo than Snowy. Maya creates a sonic boom in the process of slapping them.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} tells Elp that he's not the greatest. Elp publicly executes them.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} trash talks all of Zenishira's favourite games... it does not end well.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 {P1} wanders into Wynn's corn maze, gets lost and screams for help. Soon, the only sound left is zombies munching on bones.",
+    "label": "nokill:1",
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "🪦 Ru is feeling sleepy, she accidentally drops a fucking building on {P1} while yawning.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} claims that Summer Bash is not a real trophy. Ayan impales them with his pencil.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} dies of cringe during a conversation with Beasto.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} gets accidentally eaten by Jo. Was it really an accident? We'll never know.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} gets forced to pull Santa Geo's sleigh, which proves fatal.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} gets sued and hires Snowy as their lawyer. She causes legal damages and {P1} now owes **Elp** their soul.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} makes Nell's bruschetta recipe but adds curry to it. Nell uses a dental drill to slowly burrow into their brain.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} publicly states that rock music is the worst genre. Scorp smashes a fucking grand piano on their head.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} says that Diwix isn't a real curry muncher.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} says that Joe is very American. Joe responds as a true patriot by invading their home and taking all their oil.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} says they would make a better Twin Oreo than Snowy. Maya creates a sonic boom in the process of slapping them.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} tells Elp that he's not the greatest. Elp publicly executes {P1}",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} trash talks all of Zenishira's favourite games... it does not end well.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} tries stealing Diwix's curry stocks but gets caught.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "🪦{P1} wanders into Wynn's corn maze, gets lost and screams for help. Soon, the only sound left is zombies munching on bones.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "A sudden noise in the dark startles {P1}, who drops their heavy pistol on their face.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "After a huge fight with Snowy, {P1} obtains ketchup cookies!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "After an intense adventure, {P1} rediscovers the legendary sword Excookiebur!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "After counting a {N}/{N} time signature correctly, {P1} gets blessed with a metronome.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "After distracting Wynn from her office with a cake, {P1} steals the ban hammer!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "Congratulations to {P1} for being the champion!",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "Host: {P1}",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "Hosted by: {P1}",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "Mewtwo acknowledges {P1}'s command and attacks {P2} with Psystrike.",
+    "label": "kill:1:2",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "Showing immense loyalty to HF, {P1} choose to weild a blue guitar as their weapon.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "So creative! {P1} {N}D-printed a pistol!",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "The bowstring snaps back and smacks {P1} right in the face.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The constant ticking of the metronome drives {P1} mad, causing them to bang their head against a tree.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The fireball spell becomes unstable and explodes in {P1}'s hand.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The giant word bubbles {P1} creates are so big they block their own view, causing them to walk into a tree.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The new-age HF Exodus is happening, with {P1} at the center of it! They almost get the Legend medal, but then they woke up.",
+    "label": "none",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "The ring closes in on {P1}, dealing {N} damage!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "The Sneaky Golem reveals its true power, growing in size before delivering a massive, earth-shattering blow to {P1}.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The Sneaky Golem stands guard while {P1} eats, ensuring no one steals their food. This peace of mind helps them recover.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "The Sneaky Golem's rocky exterior crumbles unexpectedly, and a large piece falls on {P1}'s foot.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "Tick. Tock. Tick. Tock. {P1} cannot sleep and takes exhaustion damage.",
+    "label": null,
+    "source": "commands/hungergamesnew.js"
+  },
+  {
+    "template": "Unarmed {P1} couldn't fight back!",
+    "label": "none",
+    "source": "commands/hungerbr.js"
+  },
+  {
+    "template": "Walking in the long grass, {P1} finds a masterball.",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  },
+  {
+    "template": "While trying to find a secure place to poop, {P1} discovers the Death Note! But is it safe?",
+    "label": "nokill:1",
+    "source": "commands/HungerGames.js"
+  }
+]

@@ -30,7 +30,7 @@ module.exports = {
     // Pictionary game. See pictionary/discord/manager.js.
     pictionary: {
         channelId: 'YOUR_CHANNEL_ID_HERE', // games are always hosted in general chat
-        hostRoleId: 'YOUR_HOST_ROLE_ID_HERE',
+        hostRoleIds: ['YOUR_HOST_ROLE_ID_HERE'],
         ownerId: 'YOUR_OWNER_USER_ID_HERE', // owner-only analytics
         registrationSeconds: 45,
         readySeconds: 15, // time to click "Show my word & Ready" before the turn is skipped
