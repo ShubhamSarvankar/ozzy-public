@@ -51,20 +51,26 @@ function parseArgs(argv) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Retries with backoff capped at a minute. Network outages (laptop asleep,
+// Wi-Fi drop) are retried indefinitely so the run just waits them out;
+// anything else gives up after 8 tries.
+const NETWORK_CODES = new Set(['ENOTFOUND', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'EAI_AGAIN', 'ENETUNREACH', 'EPIPE', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET']);
+const isNetworkError = (err) => NETWORK_CODES.has(err.code) || NETWORK_CODES.has(err.cause?.code)
+  || /MongoNetwork|MongoServerSelection|PoolCleared|timed out|fetch failed|aborted/i.test(`${err.name} ${err.message}`);
+
 async function withRetry(fn, label) {
-  let lastErr;
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; ; i++) {
     try {
       return await fn();
     } catch (err) {
-      lastErr = err;
       if (err.status === 403 || err.status === 404) throw err; // retrying won't help
-      const backoff = 1000 * 2 ** i;
-      console.error(`[hg-archive] ${label} failed (attempt ${i + 1}/6), retrying in ${backoff}ms:`, err.message);
+      const network = isNetworkError(err);
+      if (!network && i >= 7) throw err;
+      const backoff = Math.min(60000, 1000 * 2 ** Math.min(i, 6));
+      console.error(`[hg-archive] ${label} failed (attempt ${i + 1}${network ? ', network' : '/8'}), retrying in ${backoff}ms:`, err.message);
       await sleep(backoff);
     }
   }
-  throw lastErr;
 }
 
 function toDoc(m, channelId) {
@@ -85,7 +91,7 @@ function toDoc(m, channelId) {
 async function saveOzzy(msgs, channelId) {
   const docs = msgs.filter((m) => m.author?.id === OZZY_ID).map((m) => toDoc(m, channelId));
   if (docs.length) {
-    await HgArchiveMessage.bulkWrite(docs.map((d) => ({ replaceOne: { filter: { _id: d._id }, replacement: d, upsert: true } })), { ordered: false });
+    await withRetry(() => HgArchiveMessage.bulkWrite(docs.map((d) => ({ replaceOne: { filter: { _id: d._id }, replacement: d, upsert: true } })), { ordered: false }), 'saving messages');
   }
   return docs.length;
 }
@@ -170,7 +176,7 @@ async function main() {
       if (BigInt(state.cursor) < BigInt(state.stopAt)) state.done = true;
     }
     state.pagesFetched++;
-    await state.save();
+    await withRetry(() => state.save(), 'saving progress');
   }
   console.log(`Recent messages done (${state.pagesFetched} pages). Now the ${cursors.length} crawl pages since ${since.toISOString().slice(0, 10)}.`);
 
@@ -183,7 +189,7 @@ async function main() {
     const msgs = await fetchPage(before);
     requests++;
     ozzy += await saveOzzy(msgs, channelId);
-    await HgArchivePage.updateOne({ _id: before }, { $set: { _id: before } }, { upsert: true });
+    await withRetry(() => HgArchivePage.updateOne({ _id: before }, { $set: { _id: before } }, { upsert: true }), 'marking page done');
     finished++;
     if (finished % 1000 === 0) {
       const eta = ((todo.length - finished) / Number(rate()) / 60).toFixed(0);

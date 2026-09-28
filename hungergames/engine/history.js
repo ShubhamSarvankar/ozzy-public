@@ -256,7 +256,7 @@ function computeGame(game, labels, known) {
 
   for (const msg of gameStatements(game, known)) {
     const deaths = [];
-    let hadAttack = false;
+    let hadAttack = false; // any attack or no-killer cause that the next death list may resolve
     for (const st of msg.statements) {
       if (!(st.template in labels)) unlabeled.add(st.template);
       const l = parseLabel(labels[st.template]);
@@ -272,13 +272,14 @@ function computeGame(game, labels, known) {
         hadAttack = true;
       } else if (l.type === 'nokill' && id(l.a)) {
         noKiller.add(id(l.a));
+        hadAttack = true;
       } else if (l.type === 'died' && id(l.a)) {
         deaths.push(id(l.a));
       }
     }
-    // Hits only carry into the very next message (the death list that follows
-    // the events). A message with no deaths and no attacks, like an empty
-    // Cannons list, means the earlier hits weren't lethal.
+    // Hits and no-killer causes only carry into the very next message (the
+    // death list that follows the events). A message with no deaths and no
+    // causes, like an empty Cannons list, means the earlier hits weren't lethal.
     if (deaths.length) settle(deaths);
     else if (!hadAttack) settle([]);
   }
@@ -310,6 +311,9 @@ function templateCounts(games, known) {
  */
 function suggestLabel(template, knownLabels) {
   if (knownLabels[template]) return knownLabels[template];
+  // Squad battles prefixed each attack line with "⚔️ ".
+  const bare = template.replace(/^[^\p{L}\p{N}{]+/u, '');
+  if (knownLabels[bare]) return knownLabels[bare];
   if (/^\W*\{P1\}\W*$/u.test(template)) return 'died:1';
   if (!/\{P2\}/.test(template)) return 'none';
   return null;
