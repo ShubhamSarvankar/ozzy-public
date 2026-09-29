@@ -68,17 +68,15 @@ async function showLeaderboard(interaction) {
       name: user ? user.username : r.userId,
       avatarUrl: user ? user.displayAvatarURL({ extension: 'png', size: 64 }) : null,
       badge: { value: r.wins, kind: 'points' },
-      columns: [
-        { label: 'Wins', value: r.wins },
-        { label: 'Kills', value: r.kills },
-      ],
+      columns: [{ label: 'Kills', value: r.kills }],
     };
   }));
   const png = await renderBoard({
     title: 'Hunger Games leaderboard',
-    subtitle: 'All time wins and kills',
+    subtitle: 'All time, ranked by wins (the circle)',
     rows: boardRows,
-    spec: { columnCount: 2, badgeKind: 'points', numberFormat: 'full' },
+    // Same sapphire blue as the other leaderboards' badges.
+    spec: { columnCount: 1, badgeKind: 'points', accentColor: '#0253F0', numberFormat: 'full' },
   });
   return interaction.editReply({ files: [new AttachmentBuilder(png, { name: 'hg-leaderboard.png' })] });
 }
