@@ -29,9 +29,16 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
-    GatewayIntentBits.GuildMembers,
+    // TEMPORARY (2026-10-14): MessageContent and GuildMembers are privileged
+    // intents and Discord is currently rejecting them ("Used disallowed
+    // intents"), which crash-loops the bot on connect. Both toggles are off for
+    // this application in the Developer Portal. Once they're re-enabled there,
+    // put these two lines back; until then Pictionary guessing, "!" prefix
+    // commands and Halloween text triggers are disabled (slash commands,
+    // reactions, reminders, temp roles and message counting still work).
+    // GatewayIntentBits.MessageContent,
+    // GatewayIntentBits.GuildMembers,
     // Halloween voice scare (halloween/discord/manager.js) needs voiceStateUpdate
     // and populated voice channel member lists.
     GatewayIntentBits.GuildVoiceStates,
