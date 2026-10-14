@@ -1,5 +1,6 @@
 const { Events, MessageFlags } = require('discord.js');
 const manager = require('../pictionary/discord/manager');
+const featureFlags = require('../utils/featureFlags');
 
 // Durable component router for Pictionary. All state lives in Mongo, addressed
 // through the customId, so buttons keep working across restarts.
@@ -10,6 +11,9 @@ module.exports = {
   async execute(interaction) {
     try {
       if (!interaction.isButton() || !interaction.customId.startsWith('pict:')) return;
+      if (!featureFlags.MESSAGE_CONTENT_ENABLED) {
+        return await interaction.reply({ content: featureFlags.UNAVAILABLE_NOTICE, flags: MessageFlags.Ephemeral });
+      }
       const kind = interaction.customId.split(':')[1];
       if (kind === 'show') return await manager.handleShowWordAndReady(interaction);
       if (kind === 'ctl') return await manager.handleControl(interaction);

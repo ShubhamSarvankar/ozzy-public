@@ -21,6 +21,7 @@ const mongoose = require('mongoose');
 const { Client, GatewayIntentBits, Partials, Collection, ActivityType, PresenceUpdateStatus } = require('discord.js');
 const updateAvatar = require('./utils/updateAvatar');
 const { startCrawler } = require('./crawl/messageCrawler');
+const featureFlags = require('./utils/featureFlags');
 
 const token = process.env.DISCORD_TOKEN;
 const database = process.env.MONGODB_SRV;
@@ -30,15 +31,15 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
-    // TEMPORARY (2026-10-14): MessageContent and GuildMembers are privileged
-    // intents and Discord is currently rejecting them ("Used disallowed
-    // intents"), which crash-loops the bot on connect. Both toggles are off for
-    // this application in the Developer Portal. Once they're re-enabled there,
-    // put these two lines back; until then Pictionary guessing, "!" prefix
-    // commands and Halloween text triggers are disabled (slash commands,
-    // reactions, reminders, temp roles and message counting still work).
-    // GatewayIntentBits.MessageContent,
-    // GatewayIntentBits.GuildMembers,
+    // TEMPORARY (2026-10-14): Discord revoked the MessageContent and
+    // GuildMembers privileged intents for this application (the server passed
+    // Discord's 10,000-user threshold and the privileged-intent review window
+    // lapsed). Requesting either gets the connection rejected with "Used
+    // disallowed intents" and crash-loops the bot. MessageContent comes back
+    // via utils/featureFlags.js once the application is approved again.
+    // GuildMembers stays off: nothing in this codebase needs it (every member
+    // lookup is a by-id fetch, which is allowed without the intent).
+    ...(featureFlags.MESSAGE_CONTENT_ENABLED ? [GatewayIntentBits.MessageContent] : []),
     // Halloween voice scare (halloween/discord/manager.js) needs voiceStateUpdate
     // and populated voice channel member lists.
     GatewayIntentBits.GuildVoiceStates,
@@ -53,6 +54,10 @@ const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
+  if (featureFlags.isEventDisabled(file)) {
+    console.log(`[featureFlags] skipping event ${file} (Message Content intent unavailable)`);
+    continue;
+  }
   const filePath = path.join(eventsPath, file);
   const event = require(filePath);
   if (event.once) {
@@ -70,6 +75,10 @@ for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
   if ('data' in command && 'execute' in command) {
+    if (featureFlags.isCommandDisabled(command.data.name)) {
+      console.log(`[featureFlags] skipping /${command.data.name} (Message Content intent unavailable)`);
+      continue;
+    }
     client.commands.set(command.data.name, command);
   } else {
     console.error(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);

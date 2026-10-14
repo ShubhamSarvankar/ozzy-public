@@ -4,6 +4,7 @@ const roleReactManager = require('../utils/roleReactManager');
 const reminderManager = require('../utils/reminderManager');
 const pictionaryManager = require('../pictionary/discord/manager');
 const halloweenManager = require('../halloween/discord/manager');
+const featureFlags = require('../utils/featureFlags');
 
 module.exports = {
   name: Events.ClientReady,
@@ -14,7 +15,11 @@ module.exports = {
     tempRoleManager.initialize(client);
     roleReactManager.initialize(client);
     reminderManager.initialize(client);
-    pictionaryManager.initialize(client);
+    if (featureFlags.MESSAGE_CONTENT_ENABLED) {
+      pictionaryManager.initialize(client);
+    } else {
+      console.log('[pictionary] not initialized: Message Content intent unavailable (utils/featureFlags.js)');
+    }
     halloweenManager.initialize(client);
   },
 };

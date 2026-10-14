@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { CLIENT_ID: clientId, GUILD_ID: guildId, DISCORD_TOKEN: token } = process.env;
+const featureFlags = require('./utils/featureFlags');
 
 console.log(`Deploy Token: ${token}`);
 
@@ -14,6 +15,10 @@ for (const file of commandFiles) {
   try {
     const command = require(`./commands/${file}`);
     if (command.data && command.data.toJSON) {
+      if (featureFlags.isCommandDisabled(command.data.name)) {
+        console.log(`Skipping /${command.data.name}: disabled while the Message Content intent is unavailable`);
+        continue;
+      }
       commands.push(command.data.toJSON());
     } else {
       console.error(`Command ${file} is missing data or toJSON method`);
