@@ -3,6 +3,7 @@ const tempRoleManager = require('../utils/tempRoleManager');
 const roleReactManager = require('../utils/roleReactManager');
 const reminderManager = require('../utils/reminderManager');
 const pictionaryManager = require('../pictionary/discord/manager');
+const halloweenManager = require('../halloween/discord/manager');
 
 module.exports = {
   name: Events.ClientReady,
@@ -14,5 +15,6 @@ module.exports = {
     roleReactManager.initialize(client);
     reminderManager.initialize(client);
     pictionaryManager.initialize(client);
+    halloweenManager.initialize(client);
   },
 };

@@ -43,4 +43,16 @@ module.exports = {
         registrationExtensionSeconds: 30,
         maxRegistrationExtensions: 3, // after this many extensions still short, the game ends instead
     },
+
+    // Seasonal Halloween scares, Oct 1 through Nov 1 UTC. See halloween/discord/manager.js.
+    halloween: {
+        enabled: true,
+        textChannelId: 'YOUR_CHANNEL_ID_HERE', // general chat, same as trackedChannels[0]
+        messageThreshold: 10, // strictly more than this many countable messages...
+        windowSeconds: 60, // ...inside this rolling window fires the TTS scare
+        voiceThreshold: 3, // strictly more than this many non-bot members in one voice channel fires the voice scare
+        cooldownMinutes: 30, // per feature, persisted in Mongo so a restart never resets it
+        audioPath: 'data/halloween/scare.ogg', // Ogg Opus, relative to the repo root; a missing file leaves the voice scare inert
+        voiceMaxPlaySeconds: 60, // hard cap before Ozzy leaves regardless of playback state
+    },
 };

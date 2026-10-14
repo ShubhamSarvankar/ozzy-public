@@ -11,7 +11,9 @@
   "dependencies": {
     "@discordjs/builders": "^1.8.2",
     "@discordjs/rest": "^2.3.0",
+    "@discordjs/voice": "^0.19.2",
     "@napi-rs/canvas": "^0.1.70",
+    "@snazzah/davey": "^0.1.12",
     "axios": "^1.7.2",
     "canvas": "^2.11.2",
     "chrono-node": "^2.10.1",

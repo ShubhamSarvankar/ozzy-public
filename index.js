@@ -32,6 +32,9 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMembers,
+    // Halloween voice scare (halloween/discord/manager.js) needs voiceStateUpdate
+    // and populated voice channel member lists.
+    GatewayIntentBits.GuildVoiceStates,
   ],
   // Required for messageReactionAdd/Remove to fire on messages that fell out
   // of the cache (e.g. after any restart) — rolereact messages depend on this.
