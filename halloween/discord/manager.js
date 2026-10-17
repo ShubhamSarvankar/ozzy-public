@@ -2,7 +2,8 @@
 // features, each behind its own persisted 30 minute cooldown:
 //
 //   tts    more than N countable human messages in general chat inside a
-//          rolling window sends one Discord TTS line ("Ozzy said: Boo!").
+//          rolling window sends one Discord TTS burst of spooky emojis that
+//          always includes an owl ("Ozzy said: owl ghost bat ...").
 //   voice  more than M humans in a single voice channel makes Ozzy join,
 //          play a local Ogg Opus track, and leave.
 //
