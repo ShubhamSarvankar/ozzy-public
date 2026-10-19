@@ -1,17 +1,13 @@
 // One switch for everything that depends on the Message Content gateway intent.
 //
-// Discord revoked Message Content for this application on 2026-10-14: the
-// server crossed Discord's 10,000-user privileged-intent threshold and the
-// review window lapsed (see the note in index.js). Requesting the intent now
-// gets the gateway connection rejected ("Used disallowed intents"), so it is
-// off, and every user-facing feature that needs message text is switched off
-// with it rather than left half-working.
+// Discord revoked Message Content for this application on 2026-10-14.
+// Access has since been approved, so the switch is enabled again. Message
+// Content must also be enabled in the Developer Portal before restarting.
 //
-// To restore: once the application has Message Content enabled again, set
-// MESSAGE_CONTENT_ENABLED to true, redeploy, and restart. That single change
-// re-adds the intent in index.js, loads and registers /pictionary again, and
-// re-arms the Pictionary manager on boot.
-const MESSAGE_CONTENT_ENABLED = false;
+// This switch requests the intent in index.js, loads and registers
+// /pictionary, and initializes the Pictionary manager on boot. Set it to
+// false if access becomes unavailable again to avoid rejected connections.
+const MESSAGE_CONTENT_ENABLED = true;
 
 // Slash commands that are useless without message text. Hidden from Discord
 // entirely (not loaded, not registered by deploy-commands.js) while off.
