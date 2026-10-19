@@ -9,10 +9,7 @@ const database = process.env.MONGODB_SRV;
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-mongoose.connect(database, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(async () => {
+mongoose.connect(database).then(async () => {
   console.log('Connected to the database!');
 
   try {

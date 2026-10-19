@@ -18,7 +18,7 @@ process.on('SIGTERM', () => {
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-const { Client, GatewayIntentBits, Partials, Collection, ActivityType, PresenceUpdateStatus } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, Collection, ActivityType, PresenceUpdateStatus, Events } = require('discord.js');
 const updateAvatar = require('./utils/updateAvatar');
 const { startCrawler } = require('./crawl/messageCrawler');
 const featureFlags = require('./utils/featureFlags');
@@ -86,16 +86,13 @@ for (const file of commandFiles) {
 }
 
 // Connect to the database
-mongoose.connect(database, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
+mongoose.connect(database).then(() => {
   console.log('Connected to the database!');
 }).catch((err) => {
   console.error(err);
 });
 
-client.once('ready', async () => {
+client.once(Events.ClientReady, async () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
   client.user.setPresence({
