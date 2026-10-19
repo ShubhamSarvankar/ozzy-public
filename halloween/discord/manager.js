@@ -175,10 +175,8 @@ async function handleVoiceStateUpdate(oldState, newState) {
   await playScare(channel);
 }
 
-// Joins, plays the track once, leaves. Never rejects. `onDone(reason, elapsedMs)`
-// is optional and fires exactly once, from leave(), on every exit path; the
-// auto trigger passes nothing, /scaretest uses it to report the outcome.
-async function playScare(channel, onDone = null) {
+// Joins, plays the track once, leaves. Never rejects.
+async function playScare(channel) {
   const c = cfg();
   const {
     joinVoiceChannel, createAudioPlayer, createAudioResource, entersState,
@@ -187,7 +185,7 @@ async function playScare(channel, onDone = null) {
 
   // Set synchronously, before any await, so a second voiceStateUpdate can't
   // start a second session.
-  const session = { channelId: channel.id, connection: null, player: null, timer: null, done: false, startedAt: Date.now() };
+  const session = { channelId: channel.id, connection: null, player: null, timer: null, done: false };
   activeVoiceSession = session;
 
   function leave(reason) {
@@ -210,13 +208,6 @@ async function playScare(channel, onDone = null) {
     }
     if (activeVoiceSession === session) activeVoiceSession = null;
     console.log(`[halloween] voice scare ended: ${reason}`);
-    if (onDone) {
-      try {
-        onDone(reason, Date.now() - session.startedAt);
-      } catch (err) {
-        console.warn('[halloween] onDone callback failed:', err && err.message);
-      }
-    }
   }
 
   try {
@@ -304,29 +295,6 @@ async function playScare(channel, onDone = null) {
   }
 }
 
-// Admin test hook for /scaretest: joins `channel` and plays the track through
-// the exact same playScare path, skipping only the season, member-count and
-// cooldown gates (the cooldown is neither checked nor claimed). Resolves with
-// { ok, reason, elapsedMs } when the session ends; `reason` is the same string
-// leave() logs. Never rejects.
-function playTestScare(channel) {
-  const fail = (reason) => Promise.resolve({ ok: false, reason });
-  if (!client) return fail('not-initialized');
-  if (!audioReady || !voice) return fail('voice-unavailable');
-  if (activeVoiceSession) return fail('busy');
-  if (!channel || channel.type !== ChannelType.GuildVoice) return fail('not-a-voice-channel');
-  const me = channel.guild.members.me;
-  const perms = me ? channel.permissionsFor(me) : null;
-  if (!perms || !perms.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect, PermissionFlagsBits.Speak])) {
-    return fail('missing-permissions');
-  }
-  console.log(`[halloween] voice scare TEST firing in ${channel.name}`);
-  return new Promise((resolve) => {
-    playScare(channel, (reason, elapsedMs) => resolve({ ok: true, reason, elapsedMs }))
-      .catch((err) => resolve({ ok: false, reason: `error: ${err && err.message}` }));
-  });
-}
-
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
@@ -368,4 +336,4 @@ function initialize(c) {
   console.log(`[halloween] ready (season now: ${isHalloweenSeason(new Date()) ? 'yes' : 'no'}, voice: ${audioReady && voice ? 'on' : 'off'})`);
 }
 
-module.exports = { initialize, handleMessage, handleVoiceStateUpdate, playTestScare };
+module.exports = { initialize, handleMessage, handleVoiceStateUpdate };
