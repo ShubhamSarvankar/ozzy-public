@@ -1,7 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const mongoose = require('mongoose');
-const { Client, GatewayIntentBits, Events } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const gotwModel = require('../models/gotwSchema');
 
 const DATABASE = process.env.MONGODB_SRV;
@@ -26,7 +26,7 @@ async function main() {
 
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
   await new Promise((resolve, reject) => {
-    client.once(Events.ClientReady, resolve);
+    client.once('ready', resolve);
     client.once('error', reject);
     client.login(TOKEN).catch(reject);
   });
