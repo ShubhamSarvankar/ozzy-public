@@ -6,8 +6,6 @@ const path = require('path');
 const { CLIENT_ID: clientId, GUILD_ID: guildId, DISCORD_TOKEN: token } = process.env;
 const featureFlags = require('./utils/featureFlags');
 
-console.log(`Deploy Token: ${token}`);
-
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
