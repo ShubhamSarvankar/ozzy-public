@@ -2,8 +2,8 @@
 // features, each behind its own persisted cooldown (config.halloween.cooldownMinutes):
 //
 //   tts    more than N countable human messages in general chat inside a
-//          rolling window sends one Discord TTS burst of spooky emojis that
-//          always includes an owl ("Ozzy said: owl ghost bat ...").
+//          rolling window sends one plain (non-TTS) message of spooky emojis
+//          that always includes an owl.
 //   voice  more than M humans in a single voice channel makes Ozzy join,
 //          play a local Ogg Opus track, and leave.
 //
@@ -134,7 +134,7 @@ async function handleMessage(message) {
   if (!(await claimCooldown('tts', now))) return;
 
   const content = pickPhrase();
-  await message.channel.send({ content, tts: true });
+  await message.channel.send({ content });
   console.log(`[halloween] tts scare fired in #${message.channel.name || message.channel.id}: "${content}"`);
 }
 
@@ -217,11 +217,22 @@ async function playScare(channel) {
       adapterCreator: channel.guild.voiceAdapterCreator,
       selfDeaf: true,
       selfMute: false,
+      debug: true, // TEMP DIAG: forwards networking/WS/UDP/DAVE debug lines to the 'debug' event
     });
     session.connection = connection;
     connection.on('error', (err) => {
       console.error('[halloween] voice connection error:', err);
       leave('connection-error');
+    });
+    // TEMP DIAG: remove once the voice scare is confirmed audible.
+    connection.on('stateChange', (oldS, newS) => {
+      console.log(`[halloween][diag] connection ${oldS.status} -> ${newS.status}`);
+    });
+    connection.on('debug', (msg) => {
+      // The raw WS trace includes the voice session token and the per-session
+      // secret_key; redact both before they reach the host log.
+      const safe = String(msg).replace(/"(token|secret_key)":\s*("[^"]*"|\[[^\]]*\])/g, '"$1":"<redacted>"');
+      console.log(`[halloween][diag] ${safe}`);
     });
     connection.on(VoiceConnectionStatus.Disconnected, () => leave('disconnected'));
     connection.on(VoiceConnectionStatus.Destroyed, () => leave('destroyed'));
@@ -233,6 +244,13 @@ async function playScare(channel) {
       leave('player-error');
     });
     player.on(AudioPlayerStatus.Idle, () => leave('idle'));
+    // TEMP DIAG: remove once the voice scare is confirmed audible.
+    player.on('stateChange', (oldS, newS) => {
+      console.log(`[halloween][diag] player ${oldS.status} -> ${newS.status}`);
+      if (newS.status === AudioPlayerStatus.Idle && oldS.resource) {
+        console.log(`[halloween][diag] player idle after playbackDuration=${oldS.resource.playbackDuration}ms, resource.ended=${oldS.resource.ended}`);
+      }
+    });
 
     session.timer = setTimeout(() => leave('timeout'), (c.voiceMaxPlaySeconds || 60) * 1000);
 
@@ -251,7 +269,25 @@ async function playScare(channel) {
       leave('file-error');
     });
     const resource = createAudioResource(stream, { inputType: StreamType.OggOpus });
+    // TEMP DIAG: the Ogg demuxer only forwards Opus packets. Count what it saw
+    // so a non-Opus file shows up here instead of as a silent instant Idle.
+    const demuxer = resource.playStream;
+    let opusPackets = 0;
+    let droppedSegments = 0;
+    if (demuxer && typeof demuxer.on === 'function') {
+      demuxer.on('head', () => console.log('[halloween][diag] demuxer: OpusHead found'));
+      demuxer.on('unknownSegment', () => { droppedSegments += 1; });
+      // Count via push() rather than a 'data' listener: a 'data' listener would
+      // switch the stream to flowing mode and starve the player's read() calls.
+      const origPush = demuxer.push.bind(demuxer);
+      demuxer.push = (chunk, enc) => { if (chunk !== null) opusPackets += 1; return origPush(chunk, enc); };
+      demuxer.on('end', () => {
+        console.log(`[halloween][diag] demuxer end: opusPackets=${opusPackets} nonOpusSegmentsDropped=${droppedSegments}`);
+      });
+    }
+    stream.on('end', () => console.log('[halloween][diag] audio file fully read'));
     connection.subscribe(player);
+    console.log(`[halloween][diag] play() called; connection=${connection.state.status} networking=${connection.state.networking ? connection.state.networking.state.code : 'n/a'}`);
     player.play(resource);
   } catch (err) {
     console.error('[halloween] voice scare failed:', err);

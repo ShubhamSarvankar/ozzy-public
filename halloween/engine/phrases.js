@@ -1,12 +1,11 @@
-// What Ozzy sends through Discord TTS when the text scare fires: a burst of
+// What Ozzy sends as a plain message when the text scare fires: a burst of
 // spooky emojis. Every burst contains at least one owl, mixed with a random
-// handful of other spooky emojis in a random order. Clients announce the
-// message as "Ozzy said: owl ghost jack-o-lantern ...", so keep bursts short.
+// handful of other spooky emojis in a random order. Keep bursts short.
 
 const OWL = '\u{1F989}';
 
 // The pool the owl is mixed with. Plain emoji only (no variation selectors),
-// so every entry is exactly one code point and TTS reads each one cleanly.
+// so every entry is exactly one code point and renders cleanly everywhere.
 const SPOOKY_EMOJIS = [
   '\u{1F383}', // jack-o-lantern
   '\u{1F47B}', // ghost
@@ -40,8 +39,8 @@ function randomInt(rng, maxExclusive) {
 }
 
 // Builds one emoji burst: 1-2 owls plus MIN_EXTRAS..MAX_EXTRAS distinct other
-// spooky emojis, shuffled together. Emojis are separated by spaces so Discord
-// TTS reads them as separate words instead of one run-on token.
+// spooky emojis, shuffled together. Emojis are separated by spaces so they
+// read as a burst instead of one run-on token.
 function pickPhrase(rng = Math.random) {
   const pool = SPOOKY_EMOJIS.slice();
   const extraCount = MIN_EXTRAS + randomInt(rng, MAX_EXTRAS - MIN_EXTRAS + 1);
