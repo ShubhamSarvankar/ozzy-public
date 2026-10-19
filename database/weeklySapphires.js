@@ -2,8 +2,6 @@ const { Auth } = require("../config.js");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 const conn = new MongoClient(Auth.CLUSTER_AUTH_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverApi: ServerApiVersion.v1,
 });
 

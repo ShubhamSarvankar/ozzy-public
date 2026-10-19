@@ -1,4 +1,3 @@
-const Math = require("mathjs");
 const {
   Client,
   GatewayIntentBits,
