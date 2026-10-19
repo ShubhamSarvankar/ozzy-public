@@ -20,7 +20,7 @@
     "cloudinary": "^2.6.1",
     "csv-parser": "^3.2.0",
     "discord-api-types": "^0.37.90",
-    "discord.js": "^14.25.1",
+    "discord.js": "^14.27.0",
     "dotenv": "^16.4.5",
     "jimp": "^0.22.12",
     "mathjs": "^13.0.0",

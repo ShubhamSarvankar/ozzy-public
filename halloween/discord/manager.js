@@ -1,5 +1,5 @@
 // Halloween scares: the Discord glue for halloween/engine/. Two independent
-// features, each behind its own persisted 30 minute cooldown:
+// features, each behind its own persisted cooldown (config.halloween.cooldownMinutes):
 //
 //   tts    more than N countable human messages in general chat inside a
 //          rolling window sends one Discord TTS burst of spooky emojis that
