@@ -3,7 +3,7 @@ const path = require('path');
 
 async function updateAvatar(client) {
   try {
-    const avatarPath = path.join(__dirname, '..', 'images', 'snorlax.png');
+    const avatarPath = path.join(__dirname, '..', 'images', 'ozzy_halloween.png');
 
     if (!fs.existsSync(avatarPath)) {
       console.warn('[Avatar] File not found: newpfp.png');
