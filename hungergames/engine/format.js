@@ -103,13 +103,21 @@ function cannonsSpec(result) {
   };
 }
 
+// " (+2)" after a tribute who has received two sponsor gifts this game.
+function giftTag(game, id) {
+  const n = game.giftCounts?.[id] || 0;
+  return n > 0 ? ` (+${n})` : '';
+}
+
+const SPONSOR_HINT = '🪂 Spectators and fallen tributes: press Sponsor to back a tribute';
+
 function statsSpec(game, result) {
   if (game.mode === 'solo') {
     const alive = game.players.filter((p) => p.alive).sort((a, b) => b.health - a.health);
     return {
       title: '**Results**',
       color: COLORS.stats,
-      lines: alive.map((p) => `• <@${p.id}> - ${p.health}% HP`),
+      lines: alive.map((p) => `• <@${p.id}> - ${p.health}% HP${giftTag(game, p.id)}`),
       separator: '\n',
       footer: `Total alive: ${alive.length}`,
     };
@@ -120,7 +128,7 @@ function statsSpec(game, result) {
     if (alive.length === 0) continue;
     const members = alive.map((p) => {
       const gear = p.weapons.length ? ` | ${p.weapons.map((k) => weaponLabel(SQUAD_LOOT[k].name)).join(', ')}` : '';
-      return `• <@${p.id}>: ${p.health} HP${gear}`;
+      return `• <@${p.id}>: ${p.health} HP${giftTag(game, p.id)}${gear}`;
     });
     lines.push(`**${s.name}** (${alive.length} alive, ${zoneName(s.zone)})\n${members.join('\n')}`);
   }
@@ -144,11 +152,12 @@ function phaseSpecs(game, result, extraLines = []) {
   if (!result.winnerIds && !(game.mode === 'squad' && result.phase === 'ring')) {
     const stats = statsSpec(game, result);
     stats.sponsor = (game.mode === 'solo' && result.phase === 'day') || (game.mode === 'squad' && result.phase === 'battle');
+    if (stats.sponsor) stats.footer = stats.footer ? `${stats.footer} | ${SPONSOR_HINT}` : SPONSOR_HINT;
     specs.push(stats);
   }
   return specs;
 }
 
 module.exports = {
-  weaponLabel, chunkLines, phaseSpecs, soloTitle, EMBED_BODY_LIMIT,
+  weaponLabel, chunkLines, phaseSpecs, soloTitle, giftTag, EMBED_BODY_LIMIT,
 };

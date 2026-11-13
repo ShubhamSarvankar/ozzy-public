@@ -13,7 +13,9 @@ const {
 const { createSoloGame, playSoloPhase } = require('../engine/solo');
 const { createSquadGame, playSquadPhase, addToSquads } = require('../engine/squad');
 const { phaseSpecs, chunkLines } = require('../engine/format');
-const { canSponsor, tallySponsor, applySponsorGift } = require('../engine/sponsor');
+const {
+  canSponsor, tallySponsor, applySponsorGift, giftCount, sponsorBoardLines,
+} = require('../engine/sponsor');
 const { killCounts } = require('../engine/stats');
 const {
   HOST_ROLE_IDS, OZZY_ID, MIN_PLAYERS, LOBBY_TIMEOUT_MS, STEP_TIMEOUT_MS,
@@ -116,7 +118,7 @@ async function startLobby(interaction, { mode, autoAdvance }) {
     queue: [],
     lastMessage: null,
     timers: [],
-    votes: new Map(),
+    board: null, // the open sponsor window, see openBoard()
     sponsorOpen: false,
     kills: [],
     collectors: [],
@@ -200,6 +202,45 @@ function controls(g, spec, { disabled = false } = {}) {
   return row;
 }
 
+// ---------------------------------------------------------------------------
+// Sponsor board: one public "Sponsors this round" message per sponsor window,
+// posted on the first pick and edited in place after that. Every send/edit
+// goes through board.chain so two quick picks can never post two boards. The
+// embed is built when the update is queued, not when it runs: the next phase
+// is played right after the window closes, and the board must show the votes
+// as they stood, not who survived the next phase.
+// ---------------------------------------------------------------------------
+
+function openBoard() {
+  return {
+    votes: new Map(), message: null, chain: Promise.resolve(), closed: false, winnerId: null,
+  };
+}
+
+function boardEmbed(g, board) {
+  const lines = sponsorBoardLines(g.engine, board.votes);
+  if (board.closed) {
+    lines.push('', board.winnerId
+      ? `**Sponsoring closed.** 🪂 <@${board.winnerId}> gets the gift!`
+      : '**Sponsoring closed.** No gift this round.');
+  }
+  return new EmbedBuilder()
+    .setTitle('🪂 Sponsors this round')
+    .setDescription(lines.join('\n').slice(0, 4096))
+    .setColor(COLOR);
+}
+
+function refreshBoard(g, board) {
+  // Nothing to close out if nobody ever picked.
+  if (board.closed && board.votes.size === 0) return board.chain;
+  const payload = { embeds: [boardEmbed(g, board)] };
+  board.chain = board.chain.then(async () => {
+    if (board.message) await board.message.edit(payload);
+    else board.message = await g.channel.send(payload);
+  }).catch((err) => logFail('sponsor board update failed', err));
+  return board.chain;
+}
+
 function notice(title, description) {
   return new EmbedBuilder().setTitle(title).setDescription(description).setColor(0xff5733);
 }
@@ -245,10 +286,14 @@ async function postNext(g) {
   const giftLines = [];
   if (g.sponsorOpen) {
     g.sponsorOpen = false;
-    const tributeId = tallySponsor(g.engine, g.votes);
-    g.votes = new Map();
+    const board = g.board;
+    g.board = null;
+    const tributeId = tallySponsor(g.engine, board.votes);
     const line = tributeId && applySponsorGift(g.engine, tributeId);
     if (line) giftLines.push(line);
+    board.closed = true;
+    board.winnerId = line ? tributeId : null;
+    refreshBoard(g, board);
   }
 
   if (g.queue.length === 0) {
@@ -271,7 +316,10 @@ async function postNext(g) {
     message = await g.channel.send({ embeds: [embed], components: last ? [controls(g, spec)] : [] });
   }
   g.lastMessage = { message, spec };
-  if (spec.sponsor) g.sponsorOpen = true;
+  if (spec.sponsor) {
+    g.board = openBoard();
+    g.sponsorOpen = true;
+  }
   armTimers(g);
   return null;
 }
@@ -361,10 +409,10 @@ async function handleComponent(interaction) {
   if (kind === 'sponsor') {
     if (!windowOpen) return interaction.reply({ content: 'Sponsoring for this round is closed.', ...ephemeral });
     if (!canSponsor(g.engine, interaction.user.id)) {
-      return interaction.reply({ content: "Tributes can't sponsor. Focus on staying alive!", ...ephemeral });
+      return interaction.reply({ content: "Living tributes can't sponsor. Once you fall, you can back someone.", ...ephemeral });
     }
     const alive = g.engine.players.filter((p) => p.alive);
-    const mine = g.votes.get(interaction.user.id);
+    const mine = g.board.votes.get(interaction.user.id);
     const rows = [];
     for (let page = 0; page * 25 < alive.length && page < 5; page++) {
       const slice = alive.slice(page * 25, page * 25 + 25);
@@ -373,13 +421,15 @@ async function handleComponent(interaction) {
         .setPlaceholder(alive.length > 25 ? `Tributes ${page * 25 + 1} to ${page * 25 + slice.length}` : 'Pick a tribute to sponsor')
         .addOptions(slice.map((p) => ({
           label: nameOf(g, p.id).slice(0, 100),
-          description: `${p.health} HP`,
+          description: giftCount(g.engine, p.id) > 0
+            ? `${p.health} HP, ${giftCount(g.engine, p.id)} gift${giftCount(g.engine, p.id) === 1 ? '' : 's'}`
+            : `${p.health} HP`,
           value: p.id,
           default: p.id === mine,
         })))));
     }
     return interaction.reply({
-      content: 'Back one tribute. The most-backed tribute gets a gift when the game moves on. You can change your pick until then.',
+      content: 'Back one tribute. Your pick shows up publicly on the Sponsors message, and the most-backed tribute gets a gift when the game moves on. You can change your pick until then.',
       components: rows,
       ...ephemeral,
     });
@@ -387,10 +437,21 @@ async function handleComponent(interaction) {
 
   if (kind === 'vote') {
     if (!windowOpen) return interaction.update({ content: 'Sponsoring for this round is closed.', components: [] });
-    if (!canSponsor(g.engine, interaction.user.id)) return interaction.update({ content: "Tributes can't sponsor.", components: [] });
-    const target = interaction.values[0];
-    g.votes.set(interaction.user.id, target);
-    return interaction.update({ content: `🪂 You're backing **${nameOf(g, target)}** this round. Press Sponsor again to change your pick.`, components: [] });
+    if (!canSponsor(g.engine, interaction.user.id)) return interaction.update({ content: "Living tributes can't sponsor.", components: [] });
+    const board = g.board;
+    board.votes.set(interaction.user.id, interaction.values[0]);
+    const posted = refreshBoard(g, board);
+    // The pick is shown on the public board; the private dropdown just goes away.
+    try {
+      await interaction.deferUpdate();
+      await interaction.deleteReply();
+    } catch (err) {
+      logFail('closing sponsor menu failed', err);
+      await interaction.editReply({ content: '🪂 Saved, see the Sponsors message. Press Sponsor again to change your pick.', components: [] })
+        .catch((editErr) => logFail('sponsor menu fallback failed', editErr));
+    }
+    await posted;
+    return null;
   }
   return null;
 }

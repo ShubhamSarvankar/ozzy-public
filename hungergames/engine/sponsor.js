@@ -33,6 +33,8 @@ function tallySponsor(game, votes) {
 function applySponsorGift(game, tributeId) {
   const player = game.players.find((p) => p.id === tributeId && p.alive);
   if (!player) return null;
+  game.giftCounts = game.giftCounts || {};
+  game.giftCounts[tributeId] = (game.giftCounts[tributeId] || 0) + 1;
   if (chance(0.5)) {
     player.heal(GIFT_HEAL);
     return `🪂 A parachute drifts down to <@${player.id}>: medicine from the sponsors! (+${GIFT_HEAL} HP)`;
@@ -43,4 +45,34 @@ function applySponsorGift(game, tributeId) {
   return `🪂 A parachute drifts down to <@${player.id}>. Inside: ${weaponLabel(pool[key].name)}!`;
 }
 
-module.exports = { canSponsor, tallySponsor, applySponsorGift, GIFT_HEAL };
+// How many sponsor gifts a tribute has received this game.
+function giftCount(game, tributeId) {
+  return game.giftCounts?.[tributeId] || 0;
+}
+
+/**
+ * Lines for the public "Sponsors this round" message: who backs whom, then
+ * the current standings of the vote. Picks for tributes who have since died
+ * are left out, since they can't win the gift.
+ * @param votes Map of voterId -> tributeId
+ */
+function sponsorBoardLines(game, votes) {
+  const alive = new Set(game.players.filter((p) => p.alive).map((p) => p.id));
+  const picks = [...votes].filter(([, target]) => alive.has(target));
+  if (picks.length === 0) return ['Nobody has backed a tribute yet.'];
+  const counts = new Map();
+  for (const [, target] of picks) counts.set(target, (counts.get(target) || 0) + 1);
+  const standings = [...counts]
+    .sort((a, b) => b[1] - a[1])
+    .map(([id, n]) => `<@${id}>: ${n} backer${n === 1 ? '' : 's'}`);
+  return [
+    ...picks.map(([voter, target]) => `<@${voter}> backs <@${target}>`),
+    '',
+    '**Standings**',
+    ...standings,
+  ];
+}
+
+module.exports = {
+  canSponsor, tallySponsor, applySponsorGift, giftCount, sponsorBoardLines, GIFT_HEAL,
+};
