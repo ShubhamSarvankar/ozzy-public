@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { parseMessageLink, collectReactorIds } = require('../utils/reactionUsers');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -49,22 +50,8 @@ module.exports = {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
 
-    // Helper: parse channelId & messageId from a full Discord message URL
-    function parseMessageLink(url) {
-      const parts = url.split('/');
-      const idx = parts.indexOf('channels');
-      if (idx === -1 || parts.length < idx + 4) {
-        throw new Error('Invalid Discord message URL');
-      }
-      return {
-        guildId: parts[idx + 1],
-        channelId: parts[idx + 2],
-        messageId: parts[idx + 3],
-      };
-    }
-
     try {
-      // Common: parse URL & fetch origin message
+      // Common: parse URL, fetch origin message, collect every unique non-bot reactor
       const link = interaction.options.getString('message');
       const { channelId: originChannelId, messageId } = parseMessageLink(link);
       const originChannel = await interaction.guild.channels.fetch(originChannelId);
@@ -72,15 +59,7 @@ module.exports = {
         return interaction.followUp('That channel isn’t a text channel or I can’t access it.');
       }
       const message = await originChannel.messages.fetch(messageId);
-
-      // Collect all unique users who reacted
-      const userIds = new Set();
-      for (const reaction of message.reactions.cache.values()) {
-        const users = await reaction.users.fetch();
-        users.each(u => {
-          if (!u.bot) userIds.add(u.id);
-        });
-      }
+      const userIds = new Set(await collectReactorIds(message));
 
       if (subcommand === 'event') {
         const targetChannel = interaction.options.getChannel('channel');

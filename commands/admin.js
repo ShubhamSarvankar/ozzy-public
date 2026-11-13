@@ -16,7 +16,7 @@ const sph = '<:Sapphires:792479793756110868>';
 const ayh = `<:ayanketopi:653369964472041476>`;
 
 const { promoteMember } = require('../utils/promotionHelper');
-const { parseUserList } = require('../utils/userListParser');
+const { resolveMassAddTargets } = require('../utils/reactionUsers');
 const { getMemberColor } = require('../utils/getMemberColor');
 
 let promoChannelPromise;
@@ -119,19 +119,25 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('massadd')
-        .setDescription('Add sapphires to multiple users')
-        .addStringOption(option =>
-          option
-            .setName('users')
-            .setDescription('Comma-separated list of user IDs or mentions')
-            .setRequired(true)
-        )
+        .setDescription('Add sapphires to multiple users, to everyone who reacted to a message, or both')
         .addIntegerOption(option =>
           option
             .setName('amount')
             .setDescription('The number of sapphires to add')
             .setRequired(true)
             .setMinValue(1)
+        )
+        .addStringOption(option =>
+          option
+            .setName('users')
+            .setDescription('Comma-separated list of user IDs or mentions')
+            .setRequired(false)
+        )
+        .addStringOption(option =>
+          option
+            .setName('reactions')
+            .setDescription('Message link: adds sapphires to everyone who reacted to it')
+            .setRequired(false)
         )
     )
     .addSubcommand((subcommand) =>
@@ -388,17 +394,26 @@ module.exports = {
     // Handle the 'massadd' subcommand
     if (adminSubcommand === 'massadd') {
       const usersString = interaction.options.getString('users');
+      const messageUrl  = interaction.options.getString('reactions');
       const amount      = interaction.options.getInteger('amount');
       let userIds;
+      let reactionMessageId;
 
       try {
-        userIds = parseUserList(usersString);
+        ({ userIds, messageId: reactionMessageId } = await resolveMassAddTargets({
+          usersString,
+          messageUrl,
+          guild: interaction.guild,
+        }));
       } catch (err) {
         return interaction.editReply({
-          content: `❌ Error parsing user list: ${err.message}`,
-          ephemeral: true
+          content: `❌ ${err.message}`,
         });
       }
+
+      const logReason = reactionMessageId
+        ? `Mass sapphire grant (reactions on ${reactionMessageId})`
+        : 'Mass sapphire grant';
 
       const embeds = [];
 
@@ -430,7 +445,7 @@ module.exports = {
             source: 'admin_command',
             adminId: interaction.user.id,
             channelId: interaction.channel.id,
-            reason: 'Mass sapphire grant',
+            reason: logReason,
           });
 
           const member = await interaction.guild.members
